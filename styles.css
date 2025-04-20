@@ -257,22 +257,29 @@ nav a:hover, nav a.active {
     padding: 0 1rem;
     margin-bottom: 0.5rem;
 }
-
-/* Product Images - Updated with direct image URLs */
+/* Product Images - Using GitHub identicons */
 .product-card:nth-child(1) .product-image {
-    background-image: url('https://i.imgur.com/XvEmLSB.jpg');
+    background-image: url('https://github.com/identicons/diving-mask.png');
+    background-size: cover;
+    background-position: center;
 }
 
 .product-card:nth-child(2) .product-image {
-    background-image: url('https://i.imgur.com/2oWQN5G.jpg');
+    background-image: url('https://github.com/identicons/regulator.png');
+    background-size: cover;
+    background-position: center;
 }
 
 .product-card:nth-child(3) .product-image {
-    background-image: url('https://i.imgur.com/UQG8FuL.jpg');
+    background-image: url('https://github.com/identicons/fins.png');
+    background-size: cover;
+    background-position: center;
 }
 
 .product-card:nth-child(4) .product-image {
-    background-image: url('https://i.imgur.com/Vw2N3ER.jpg');
+    background-image: url('https://github.com/identicons/dive-computer.png');
+    background-size: cover;
+    background-position: center;
 }
 /* Collection Banner */
 .collection-banner {
