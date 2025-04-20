@@ -257,27 +257,27 @@ nav a:hover, nav a.active {
     padding: 0 1rem;
     margin-bottom: 0.5rem;
 }
-/* Product Images - Using GitHub identicons */
+/* Product Images - Using placekitten as a reliable image source */
 .product-card:nth-child(1) .product-image {
-    background-image: url('https://github.com/identicons/diving-mask.png');
+    background-image: url('https://placekitten.com/400/300');
     background-size: cover;
     background-position: center;
 }
 
 .product-card:nth-child(2) .product-image {
-    background-image: url('https://github.com/identicons/regulator.png');
+    background-image: url('https://placekitten.com/401/300');
     background-size: cover;
     background-position: center;
 }
 
 .product-card:nth-child(3) .product-image {
-    background-image: url('https://github.com/identicons/fins.png');
+    background-image: url('https://placekitten.com/402/300');
     background-size: cover;
     background-position: center;
 }
 
 .product-card:nth-child(4) .product-image {
-    background-image: url('https://github.com/identicons/dive-computer.png');
+    background-image: url('https://placekitten.com/403/300');
     background-size: cover;
     background-position: center;
 }
