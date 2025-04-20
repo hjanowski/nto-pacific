@@ -540,7 +540,7 @@ input, select {
 
 /* For the first product image - use placeholder images for now */
 .product-card:nth-child(1) .product-image {
-    background-image: url('.images/mares-x-vision-ultra-ls-mirror-diving-mask.webp');
+    background-image: url('images/mares-x-vision-ultra-ls-mirror-diving-mask.webp');
 }
 
 .product-card:nth-child(2) .product-image {
@@ -548,7 +548,7 @@ input, select {
 }
 
 .product-card:nth-child(3) .product-image {
-    background-image: url('https://via.placeholder.com/250x200?text=Limited+Fins');
+    background-image: url('images/cressi-gara-modular-impulse-spearfishing-fins.webp');
 }
 
 .product-card:nth-child(4) .product-image {
