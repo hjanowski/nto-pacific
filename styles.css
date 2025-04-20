@@ -666,3 +666,109 @@ input, select {
     padding-top: 0.5rem;
     border-top: 1px solid #ddd;
 }
+/* Enhanced Modal and Order Summary Styles */
+
+/* Modal Content Improvements */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    overflow-y: auto; /* Allow scrolling for the entire modal */
+}
+
+.modal-content {
+    background-color: var(--white);
+    margin: 5% auto; /* Reduced from 10% to show more content */
+    padding: 2rem;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh; /* Increased from default */
+    overflow-y: auto; /* Allow scrolling within the modal content */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 1001;
+}
+
+/* Checkout Modal Specific Improvements */
+#checkout-modal .modal-content {
+    max-height: 85vh; /* Even more height for checkout */
+    overflow-y: auto;
+}
+
+/* Move Order Summary to Top in Checkout */
+#checkout-form {
+    display: flex;
+    flex-direction: column;
+}
+
+#checkout-form .order-summary {
+    order: -1; /* Move to top */
+    margin-top: 0;
+    margin-bottom: 2rem;
+}
+
+/* Enhanced Order Summary Styles */
+.order-summary {
+    background-color: var(--light-gray);
+    padding: 1.5rem;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+    max-height: none; /* Remove height restriction */
+    overflow: visible; /* Make sure everything is visible */
+}
+
+.order-summary h3 {
+    margin-bottom: 1rem;
+    color: var(--medium-blue);
+}
+
+.order-items {
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 1rem;
+}
+
+.order-item, .order-subtotal, .order-shipping, .order-total-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.order-item {
+    font-size: var(--fs-sm);
+    color: var(--dark-gray);
+}
+
+.order-subtotal, .order-shipping {
+    font-size: var(--fs-sm);
+    color: var(--medium-blue);
+}
+
+.order-total-row {
+    font-weight: 600;
+    font-size: var(--fs-md);
+    color: var(--deep-blue);
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #ddd;
+}
+
+/* Make the form sections more compact */
+.form-section {
+    margin-bottom: 1.5rem; /* Reduced from 2rem */
+}
+
+.form-group {
+    margin-bottom: 1rem; /* Reduced from 1.5rem */
+}
+
+/* Make sure there's nothing hidden at the bottom */
+#checkout-form button[type="submit"] {
+    margin-bottom: 1rem;
+}
+
