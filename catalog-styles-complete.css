@@ -1,0 +1,245 @@
+/* Catalog Page Styles */
+
+/* Hero Banner */
+.catalog-hero {
+    background: linear-gradient(rgba(10, 44, 60, 0.8), rgba(28, 79, 107, 0.7)), url('images/pexels-stuart-pritchards-413737-1274009.jpg');
+    background-size: cover;
+    background-position: center;
+    color: var(--white);
+    padding: 4rem 0;
+    text-align: center;
+}
+
+.catalog-hero h2 {
+    font-size: var(--fs-xl);
+    margin-bottom: 0.5rem;
+}
+
+.catalog-hero p {
+    font-size: var(--fs-md);
+    color: var(--sand);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Catalog Layout */
+.catalog-content {
+    padding: 3rem 0;
+}
+
+.catalog-layout {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 2rem;
+}
+
+/* Sidebar Styles */
+.catalog-sidebar {
+    background-color: var(--light-gray);
+    border-radius: 8px;
+    padding: 1.5rem;
+    align-self: start;
+    position: sticky;
+    top: 20px;
+}
+
+.catalog-sidebar h3 {
+    color: var(--deep-blue);
+    margin-bottom: 1rem;
+    font-size: var(--fs-md);
+}
+
+.category-list {
+    list-style: none;
+    margin-bottom: 2rem;
+}
+
+.category-list li {
+    margin-bottom: 0.5rem;
+}
+
+.category-list a {
+    text-decoration: none;
+    color: var(--medium-blue);
+    display: block;
+    padding: 0.5rem 0;
+    transition: all 0.3s ease;
+}
+
+.category-list a:hover, .category-list a.active {
+    color: var(--accent-aqua);
+    padding-left: 0.5rem;
+}
+
+/* Filter Sections */
+.filter-section {
+    border-top: 1px solid #ddd;
+    padding-top: 1.5rem;
+}
+
+.filter-group {
+    margin-bottom: 1.5rem;
+}
+
+.filter-group h4 {
+    font-size: var(--fs-sm);
+    margin-bottom: 0.5rem;
+    color: var(--deep-blue);
+}
+
+.price-slider {
+    margin-bottom: 1rem;
+}
+
+.slider {
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.price-values {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--fs-xs);
+    color: var(--medium-blue);
+}
+
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    font-size: var(--fs-xs);
+    color: var(--dark-gray);
+}
+
+.checkbox-group input {
+    margin-right: 0.5rem;
+}
+
+/* Product Listing */
+.catalog-products {
+    min-height: 800px; /* Ensure scrolling works with filter */
+}
+
+.category-section {
+    margin-bottom: 3rem;
+    scroll-margin-top: 100px; /* For smooth scrolling to sections */
+}
+
+.category-title {
+    color: var(--deep-blue);
+    border-bottom: 2px solid var(--accent-aqua);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Product Images for new categories */
+.mask-image-1 {
+    background-image: url('images/crystal-view-mask.webp');
+}
+
+.mask-image-2 {
+    background-image: url('images/aqua-snorkel-pro.webp');
+}
+
+.mask-image-3 {
+    background-image: url('images/junior-mask-snorkel-set.webp');
+}
+
+.reg-image-1 {
+    background-image: url('images/deep-sea-regulator.webp');
+}
+
+.reg-image-2 {
+    background-image: url('images/pro-divers-octopus.webp');
+}
+
+.reg-image-3 {
+    background-image: url('images/regulator-first-stage.webp');
+}
+
+.fins-image-1 {
+    background-image: url('images/adjustable-dive-fins.webp');
+}
+
+.fins-image-2 {
+    background-image: url('images/travel-fins-compact.webp');
+}
+
+.fins-image-3 {
+    background-image: url('images/freediving-carbon-fins.webp');
+}
+
+.comp-image-1 {
+    background-image: url('images/wrist-dive-computer.webp');
+}
+
+.comp-image-2 {
+    background-image: url('images/console-computer-combo.webp');
+}
+
+.comp-image-3 {
+    background-image: url('images/freediver-computer.webp');
+}
+
+.suit-image-1 {
+    background-image: url('images/3mm-tropical-wetsuit.webp');
+}
+
+.suit-image-2 {
+    background-image: url('images/7mm-cold-water-suit.webp');
+}
+
+.suit-image-3 {
+    background-image: url('images/womens-wetsuit-5mm.webp');
+}
+
+.acc-image-1 {
+    background-image: url('images/dive-reel-100m.webp');
+}
+
+/* Responsive styles */
+@media (max-width: 992px) {
+    .catalog-layout {
+        grid-template-columns: 1fr;
+    }
+    
+    .catalog-sidebar {
+        position: static;
+        margin-bottom: 2rem;
+    }
+}
+
+/* Animation for section transitions */
+.category-section {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Active category highlight */
+.catalog-products .category-section:target {
+    animation: highlightSection 2s ease-out;
+}
+
+@keyframes highlightSection {
+    0% {
+        background-color: rgba(64, 191, 180, 0.1);
+    }
+    100% {
+        background-color: transparent;
+    }
+}
