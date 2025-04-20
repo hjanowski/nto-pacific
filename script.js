@@ -101,102 +101,55 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Fix Continue Shopping buttons
+    fixContinueShoppingButtons();
+
     // Checkout button
-   // Checkout button
-checkoutBtn.addEventListener('click', () => {
-    if (state.currentUser) {
-        // If user is logged in, proceed to checkout
-        closeModal('cart-modal');
-        openModal('checkout-modal');
-        
-        // Calculate the total including shipping
-        const subtotal = state.cartTotal;
-        const shipping = subtotal > 0 ? 10 : 0; // Fixed shipping cost for simplicity
-        const total = subtotal + shipping;
-        
-        // Create a detailed order summary
-        const orderSummary = document.querySelector('.order-summary');
-        orderSummary.innerHTML = ''; // Clear previous content
-        
-        // Add heading
-        const heading = document.createElement('h3');
-        heading.textContent = 'Order Summary';
-        orderSummary.appendChild(heading);
-        
-        // Add item list
-        if (state.cart.length > 0) {
-            const itemsList = document.createElement('div');
-            itemsList.classList.add('order-items');
+    checkoutBtn.addEventListener('click', () => {
+        if (state.currentUser) {
+            // If user is logged in, proceed to checkout
+            closeModal('cart-modal');
+            openModal('checkout-modal');
             
-            state.cart.forEach(item => {
-                const itemRow = document.createElement('div');
-                itemRow.classList.add('order-item');
-                itemRow.innerHTML = `
-                    <span>${item.name} × ${item.quantity}</span>
-                    <span>$${(item.price * item.quantity).toFixed(2)}</span>
-                `;
-                itemsList.appendChild(itemRow);
-            });
+            // Calculate the total including shipping
+            const subtotal = state.cartTotal;
+            const shipping = subtotal > 0 ? 10 : 0; // Fixed shipping cost for simplicity
+            const total = subtotal + shipping;
             
-            orderSummary.appendChild(itemsList);
+            // Update the existing order total element
+            const orderTotalElement = document.getElementById('order-total');
+            if (orderTotalElement) {
+                orderTotalElement.textContent = `$${total.toFixed(2)}`;
+                
+                // Enhance the order summary display after updating the total
+                enhanceOrderSummary();
+            }
             
-            // Add subtotal
-            const subtotalRow = document.createElement('div');
-            subtotalRow.classList.add('order-subtotal');
-            subtotalRow.innerHTML = `
-                <span>Subtotal</span>
-                <span>$${subtotal.toFixed(2)}</span>
-            `;
-            orderSummary.appendChild(subtotalRow);
-            
-            // Add shipping
-            const shippingRow = document.createElement('div');
-            shippingRow.classList.add('order-shipping');
-            shippingRow.innerHTML = `
-                <span>Shipping</span>
-                <span>$${shipping.toFixed(2)}</span>
-            `;
-            orderSummary.appendChild(shippingRow);
-            
-            // Add total
-            const totalRow = document.createElement('div');
-            totalRow.classList.add('order-total-row');
-            totalRow.innerHTML = `
-                <span>Total</span>
-                <span id="order-total">$${total.toFixed(2)}</span>
-            `;
-            orderSummary.appendChild(totalRow);
+            // Pre-fill shipping name with user's name if available
+            if (state.currentUser.name) {
+                document.getElementById('shipping-name').value = state.currentUser.name;
+            }
         } else {
-            // If cart is empty (shouldn't happen normally)
-            const emptyMessage = document.createElement('p');
-            emptyMessage.textContent = 'Your cart is empty.';
-            orderSummary.appendChild(emptyMessage);
+            // If not logged in, prompt to login
+            closeModal('cart-modal');
+            openModal('login-modal');
+            // Show message that login is required
+            const loginForm = document.getElementById('login-form');
+            const message = document.createElement('p');
+            message.classList.add('error-message');
+            message.textContent = 'Please login to proceed with checkout';
+            message.style.color = 'var(--accent-aqua)';
+            message.style.textAlign = 'center';
+            message.style.marginBottom = '1rem';
+            
+            // Check if message already exists
+            const existingMessage = loginForm.querySelector('.error-message');
+            if (!existingMessage) {
+                loginForm.prepend(message);
+            }
         }
-        
-        // Pre-fill shipping name with user's name if available
-        if (state.currentUser.name) {
-            document.getElementById('shipping-name').value = state.currentUser.name;
-        }
-    } else {
-        // If not logged in, prompt to login
-        closeModal('cart-modal');
-        openModal('login-modal');
-        // Show message that login is required
-        const loginForm = document.getElementById('login-form');
-        const message = document.createElement('p');
-        message.classList.add('error-message');
-        message.textContent = 'Please login to proceed with checkout';
-        message.style.color = 'var(--accent-aqua)';
-        message.style.textAlign = 'center';
-        message.style.marginBottom = '1rem';
-        
-        // Check if message already exists
-        const existingMessage = loginForm.querySelector('.error-message');
-        if (!existingMessage) {
-            loginForm.prepend(message);
-        }
-    }
-});
+    });
+
     // ========== Authentication Form Submissions ==========
     
     // Login Form
@@ -328,6 +281,123 @@ checkoutBtn.addEventListener('click', () => {
         checkoutForm.reset();
     });
 });
+
+// ===== ENHANCED ORDER SUMMARY FUNCTION =====
+function enhanceOrderSummary() {
+    // Get the order summary element
+    const orderSummary = document.querySelector('.order-summary');
+    if (!orderSummary) return; // Exit if not found
+    
+    // Store the original content before modifying
+    const originalContent = orderSummary.innerHTML;
+    
+    // Get the existing order total element
+    const orderTotalElement = document.getElementById('order-total');
+    if (!orderTotalElement) {
+        // If element not found, restore original content and exit
+        orderSummary.innerHTML = originalContent;
+        return;
+    }
+    
+    // Extract the current total value
+    const orderTotalText = orderTotalElement.textContent;
+    const totalValue = orderTotalText.replace('$', '').trim();
+    
+    try {
+        // Calculate components
+        const subtotal = state.cartTotal;
+        const shipping = subtotal > 0 ? 10 : 0;
+        
+        // Clear the order summary but keep its structure simple
+        orderSummary.innerHTML = '';
+        
+        // Add heading
+        const heading = document.createElement('h3');
+        heading.textContent = 'Order Summary';
+        orderSummary.appendChild(heading);
+        
+        // Add items if cart has items
+        if (state.cart && state.cart.length > 0) {
+            // Add item list
+            const itemsList = document.createElement('div');
+            itemsList.classList.add('order-items');
+            
+            state.cart.forEach(item => {
+                const itemRow = document.createElement('div');
+                itemRow.classList.add('order-item');
+                itemRow.innerHTML = `
+                    <span>${item.name} × ${item.quantity}</span>
+                    <span>$${(item.price * item.quantity).toFixed(2)}</span>
+                `;
+                itemsList.appendChild(itemRow);
+            });
+            
+            orderSummary.appendChild(itemsList);
+            
+            // Add subtotal
+            const subtotalRow = document.createElement('div');
+            subtotalRow.classList.add('order-subtotal');
+            subtotalRow.innerHTML = `
+                <span>Subtotal</span>
+                <span>$${subtotal.toFixed(2)}</span>
+            `;
+            orderSummary.appendChild(subtotalRow);
+            
+            // Add shipping
+            const shippingRow = document.createElement('div');
+            shippingRow.classList.add('order-shipping');
+            shippingRow.innerHTML = `
+                <span>Shipping</span>
+                <span>$${shipping.toFixed(2)}</span>
+            `;
+            orderSummary.appendChild(shippingRow);
+            
+            // Add total
+            const totalRow = document.createElement('div');
+            totalRow.classList.add('order-total-row');
+            
+            // Create a new span with id="order-total" for the total
+            const newTotalElement = document.createElement('span');
+            newTotalElement.id = 'order-total';
+            newTotalElement.textContent = `$${totalValue}`;
+            
+            totalRow.innerHTML = `<span>Total</span>`;
+            totalRow.appendChild(newTotalElement);
+            
+            orderSummary.appendChild(totalRow);
+        } else {
+            // Handle empty cart case
+            const emptyMessage = document.createElement('p');
+            emptyMessage.textContent = 'No items in cart.';
+            orderSummary.appendChild(emptyMessage);
+            
+            // Recreate the total element
+            const totalParagraph = document.createElement('p');
+            totalParagraph.innerHTML = `Total: <span id="order-total">$${totalValue}</span>`;
+            orderSummary.appendChild(totalParagraph);
+        }
+    } catch (error) {
+        // In case of any error, restore the original content
+        console.error('Error enhancing order summary:', error);
+        orderSummary.innerHTML = originalContent;
+    }
+}
+
+// ===== FIX CONTINUE SHOPPING BUTTONS =====
+function fixContinueShoppingButtons() {
+    const closeConfirmationButtons = document.querySelectorAll('.close-confirmation');
+    
+    closeConfirmationButtons.forEach(button => {
+        // Create a new button to replace the existing one (to remove all event listeners)
+        const newButton = button.cloneNode(true);
+        button.parentNode.replaceChild(newButton, button);
+        
+        // Add a fresh event listener
+        newButton.addEventListener('click', () => {
+            closeModal('confirmation-modal');
+        });
+    });
+}
 
 // ========== Authentication Functions ==========
 
