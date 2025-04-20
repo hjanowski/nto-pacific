@@ -624,3 +624,45 @@ input, select {
     padding-top: 0.5rem;
     border-top: 1px solid #ddd;
 }
+/* Add these styles to the end of your styles.css file */
+
+/* Enhanced Order Summary Styles */
+.order-summary {
+    background-color: var(--light-gray);
+    padding: 1.5rem;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+    max-height: 50vh; /* Limit max height */
+    overflow-y: auto; /* Add scroll if needed */
+}
+
+.order-items {
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 1rem;
+}
+
+.order-item, .order-subtotal, .order-shipping, .order-total-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.order-item {
+    font-size: var(--fs-sm);
+    color: var(--dark-gray);
+}
+
+.order-subtotal, .order-shipping {
+    font-size: var(--fs-sm);
+    color: var(--medium-blue);
+}
+
+.order-total-row {
+    font-weight: 600;
+    font-size: var(--fs-md);
+    color: var(--deep-blue);
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #ddd;
+}
