@@ -36,6 +36,19 @@
                 <h2>Explore the Depths</h2>
                 <p>Professional diving equipment for every adventure</p>
                <button class="btn-primary btn-large" id="shop-now-btn">Shop Now</button>
+
+                <script>
+    document.getElementById('shop-now-btn').addEventListener('click', function() {
+        // Try different path approaches
+        try {
+            // First try relative path
+            window.location.href = './catalog.html';
+        } catch (e) {
+            // If that fails, try absolute path
+            window.location.href = '/catalog.html';
+        }
+    });
+</script>
             </div>
         </div>
     </section>
