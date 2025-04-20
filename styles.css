@@ -552,7 +552,7 @@ input, select {
 }
 
 .product-card:nth-child(4) .product-image {
-    background-image: url('https://via.placeholder.com/250x200?text=Dive+Computer');
+    background-image: url('images/mares-genius-dive-computer.webp');
 }
 
 /* Responsive Design */
