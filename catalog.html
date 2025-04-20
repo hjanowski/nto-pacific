@@ -6,12 +6,8 @@
     <title>NTO Pacific | Product Catalog</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="catalog-styles.css">
-    <script src="https://cdn.pc-rnd.c360a.salesforce.com/beacon/c360a/668445a5-5cb7-4510-be95-a0759319bb39/scripts/c360a.min.js"></script>
     <script src="script.js" defer></script>
     <script src="catalog.js" defer></script>
-    ```html
-   <link rel="stylesheet" href="catalog-styles.css">
-   ```
 </head>
 <body>
     <header>
@@ -35,256 +31,334 @@
         </div>
     </header>
 
-    <section class="catalog-hero">
+    <div class="catalog-hero">
         <div class="container">
-            <h2>Product Catalog</h2>
+            <h1>Product Catalog</h1>
             <p>Find the perfect equipment for your next diving adventure</p>
         </div>
-    </section>
+    </div>
 
-    <section class="catalog-content">
-        <div class="container">
-            <div class="catalog-layout">
-                <!-- Category Sidebar -->
-                <div class="catalog-sidebar">
-                    <h3>Categories</h3>
-                    <ul class="category-list">
-                        <li><a href="#masks" class="active">Masks & Snorkels</a></li>
-                        <li><a href="#regulators">Regulators</a></li>
-                        <li><a href="#fins">Fins</a></li>
-                        <li><a href="#computers">Dive Computers</a></li>
-                        <li><a href="#wetsuits">Wetsuits</a></li>
-                        <li><a href="#accessories">Accessories</a></li>
-                    </ul>
+    <div class="catalog-container">
+        <!-- Left sidebar with categories and filters -->
+        <div class="catalog-sidebar">
+            <div class="sidebar-section">
+                <h3>Categories</h3>
+                <ul class="categories-list">
+                    <li><a href="#masks" class="active">Masks & Snorkels</a></li>
+                    <li><a href="#regulators">Regulators</a></li>
+                    <li><a href="#fins">Fins</a></li>
+                    <li><a href="#computers">Dive Computers</a></li>
+                    <li><a href="#wetsuits">Wetsuits</a></li>
+                    <li><a href="#accessories">Accessories</a></li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3>Filter</h3>
+                <div class="filter-section">
+                    <h4>Price Range</h4>
+                    <div class="price-range">
+                        <input type="range" min="0" max="1000" value="1000" id="price-slider">
+                        <div class="price-values">
+                            <span>$0</span>
+                            <span id="price-display">$1000+</span>
+                        </div>
+                    </div>
                     
-                    <div class="filter-section">
-                        <h3>Filter</h3>
-                        <div class="filter-group">
-                            <h4>Price Range</h4>
-                            <div class="price-slider">
-                                <input type="range" min="0" max="1000" value="1000" class="slider" id="price-range">
-                                <div class="price-values">
-                                    <span>$0</span>
-                                    <span id="price-display">$1000+</span>
-                                </div>
-                            </div>
+                    <h4>Brand</h4>
+                    <div class="brand-options">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="brand-nto" checked>
+                            <label for="brand-nto">NTO Pacific</label>
                         </div>
-                        <div class="filter-group">
-                            <h4>Brand</h4>
-                            <div class="checkbox-group">
-                                <label><input type="checkbox" checked> NTO Pacific</label>
-                                <label><input type="checkbox" checked> Aqua Lung</label>
-                                <label><input type="checkbox" checked> Mares</label>
-                                <label><input type="checkbox" checked> Cressi</label>
-                                <label><input type="checkbox" checked> ScubaPro</label>
-                            </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="brand-aqua" checked>
+                            <label for="brand-aqua">Aqua Lung</label>
                         </div>
-                        <div class="filter-group">
-                            <h4>Availability</h4>
-                            <div class="checkbox-group">
-                                <label><input type="checkbox" checked> In Stock</label>
-                                <label><input type="checkbox"> Out of Stock</label>
-                            </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="brand-mares" checked>
+                            <label for="brand-mares">Mares</label>
                         </div>
-                        <button class="btn-primary" id="apply-filters">Apply Filters</button>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="brand-cressi" checked>
+                            <label for="brand-cressi">Cressi</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="brand-scubapro" checked>
+                            <label for="brand-scubapro">ScubaPro</label>
+                        </div>
+                    </div>
+                    
+                    <h4>Availability</h4>
+                    <div class="availability-options">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="in-stock" checked>
+                            <label for="in-stock">In Stock</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="out-of-stock">
+                            <label for="out-of-stock">Out of Stock</label>
+                        </div>
+                    </div>
+                    
+                    <button class="apply-filters">Apply Filters</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right content area with products -->
+        <div class="products-section">
+            <!-- Masks & Snorkels Category -->
+            <div class="category-section" id="masks">
+                <div class="category-header">
+                    <h2>Masks & Snorkels</h2>
+                </div>
+                <div class="products-grid">
+                    <div class="product-card" data-product-id="1" data-product-name="Elite Pro Diving Mask" data-product-price="129.99" data-in-stock="true">
+                        <div class="product-image" style="background-image: url('images/mares-x-vision-ultra-ls-mirror-diving-mask.webp');"></div>
+                        <div class="product-info">
+                            <h3 class="product-title">Elite Pro Diving Mask</h3>
+                            <p class="product-price">$129.99</p>
+                            <button class="add-to-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                    <div class="product-card" data-product-id="9" data-product-name="Crystal View Mask" data-product-price="99.99" data-in-stock="true">
+                        <div class="product-image" style="background-image: url('images/crystal-view-mask.webp');"></div>
+                        <div class="product-info">
+                            <h3 class="product-title">Crystal View Mask</h3>
+                            <p class="product-price">$99.99</p>
+                            <button class="add-to-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                    <div class="product-card" data-product-id="10" data-product-name="Aqua Snorkel Pro" data-product-price="49.99" data-in-stock="true">
+                        <div class="product-image" style="background-image: url('images/aqua-snorkel-pro.webp');"></div>
+                        <div class="product-info">
+                            <h3 class="product-title">Aqua Snorkel Pro</h3>
+                            <p class="product-price">$49.99</p>
+                            <button class="add-to-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                    <div class="product-card" data-product-id="11" data-product-name="Junior Mask & Snorkel Set" data-product-price="79.99" data-in-stock="true">
+                        <div class="product-image" style="background-image: url('images/junior-mask-snorkel-set.webp');"></div>
+                        <div class="product-info">
+                            <h3 class="product-title">Junior Mask & Snorkel Set</h3>
+                            <p class="product-price">$79.99</p>
+                            <button class="add-to-cart">Add to Cart</button>
+                        </div>
                     </div>
                 </div>
-                
-                <!-- Product Display Area -->
-                <div class="catalog-products">
-                    <!-- Masks & Snorkels Category -->
-                    <div class="category-section" id="masks">
-                        <h2 class="category-title">Masks & Snorkels</h2>
-                        <div class="products-grid">
-                            <div class="product-card" data-product-id="1" data-product-name="Elite Pro Diving Mask" data-product-price="129.99" data-in-stock="true">
-                                <div class="product-image"></div>
-                                <h3>Elite Pro Diving Mask</h3>
-                                <p class="product-price">$129.99</p>
-                                <button class="btn-secondary add-to-cart">Add to Cart</button>
-                            </div>
-                            <div class="product-card" data-product-id="9" data-product-name="Crystal View Mask" data-product-price="99.99" data-in-stock="true">
-                                <div class="product-image mask-image-1"></div>
-                                <h3>Crystal View Mask</h3>
-                                <p class="product-price">$99.99</p>
-                                <button class="btn-secondary add-to-cart">Add to Cart</button>
-                            </div>
-                            <div class="product-card" data-product-id="10" data-product-name="Aqua Snorkel Pro" data-product-price="49.99" data-in-stock="true">
-                                <div class="product-image mask-image-2"></div>
-                                <h3>Aqua Snorkel Pro</h3>
-                                <p class="product-price">$49.99</p>
-                                <button class="btn-secondary add-to-cart">Add to Cart</button>
-                            </div>
-                            <div class="product-card" data-product-id="11" data-product-name="Junior Mask & Snorkel Set" data-product-price="79.99" data-in-stock="true">
-                                <div class="product-image mask-image-3"></div>
-                                <h3>Junior Mask & Snorkel Set</h3>
-                                <p class="product-price">$79.99</p>
-                                <button class="btn-secondary add-to-cart">Add to Cart</button>
-                            </div>
+            </div>
+            
+            <!-- Regulators Category -->
+            <div class="category-section" id="regulators">
+                <div class="category-header">
+                    <h2>Regulators</h2>
+                </div>
+                <div class="products-grid">
+                    <div class="product-card" data-product-id="2" data-product-name="Aqua Lung Regulator" data-product-price="349.99" data-in-stock="true">
+                        <div class="product-image" style="background-image: url('images/aqualung-leg3nd-elite-din-diving-regulator-set.webp');"></div>
+                        <div class="product-info">
+                            <h3 class="product-title">Aqua Lung Regulator</h3>
+                            <p class="product-price">$349.99</p>
+                            <button class="add-to-cart">Add to Cart</button>
                         </div>
                     </div>
-                    
-                    <!-- Regulators Category -->
-                    <div class="category-section" id="regulators">
-                        <h2 class="category-title">Regulators</h2>
-                        <div class="products-grid">
-                            <div class="product-card" data-product-id="2" data-product-name="Aqua Lung Regulator" data-product-price="349.99" data-in-stock="true">
-                                <div class="product-image"></div>
-                                <h3>Aqua Lung Regulator</h3>
-                                <p class="product-price">$349.99</p>
-                                <button class="btn-secondary add-to-cart">Add to Cart</button>
-                            </div>
-                            <div class="product-card" data-product-id="12" data-product-name="Deep Sea Regulator" data-product-price="299.99" data-in-stock="true">
-                                <div class="product-image reg-image-1"></div>
-                                <h3>Deep Sea Regulator</h3>
-                                <p class="product-price">$299.99</p>
-                                <button class="btn-secondary add-to-cart">Add to Cart</button>
-                            </div>
-                            <div class="product-card" data-product-id="13" data-product-name="Pro Divers Octopus" data-product-price="179.99" data-in-stock="true">
-                                <div class="product-image reg-image-2"></div>
-                                <h3>Pro Divers Octopus</h3>
-                                <p class="product-price">$179.99</p>
-                                <button class="btn-secondary add-to-cart">Add to Cart</button>
-                            </div>
-                            <div class="product-card" data-product-id="14" data-product-name="Regulator First Stage" data-product-price="249.99" data-in-stock="false">
-                                <div class="product-image reg-image-3"></div>
-                                <h3>Regulator First Stage</h3>
-                                <p class="product-price">$249.99</p>
-                                <p class="out-of-stock">Out of Stock</p>
-                                <button class="btn-secondary notify-me">Notify Me</button>
-                            </div>
+                    <div class="product-card" data-product-id="12" data-product-name="Deep Sea Regulator" data-product-price="299.99" data-in-stock="true">
+                        <div class="product-image" style="background-image: url('images/deep-sea-regulator.webp');"></div>
+                        <div class="product-info">
+                            <h3 class="product-title">Deep Sea Regulator</h3>
+                            <p class="product-price">$299.99</p>
+                            <button class="add-to-cart">Add to Cart</button>
                         </div>
                     </div>
-                    
-                    <!-- Fins Category -->
-                    <div class="category-section" id="fins">
-                        <h2 class="category-title">Fins</h2>
-                        <div class="products-grid">
-                            <div class="product-card" data-product-id="3" data-product-name="Pacific Fins - Limited Edition" data-product-price="189.99" data-in-stock="false">
-                                <div class="product-image"></div>
-                                <h3>Pacific Fins - Limited Edition</h3>
-                                <p class="product-price">$189.99</p>
-                                <p class="out-of-stock">Out of Stock</p>
-                                <button class="btn-secondary notify-me">Notify Me</button>
-                            </div>
-                            <div class="product-card" data-product-id="15" data-product-name="Adjustable Dive Fins" data-product-price="139.99" data-in-stock="true">
-                                <div class="product-image fins-image-1"></div>
-                                <h3>Adjustable Dive Fins</h3>
-                                <p class="product-price">$139.99</p>
-                                <button class="btn-secondary add-to-cart">Add to Cart</button>
-                            </div>
-                            <div class="product-card" data-product-id="16" data-product-name="Travel Fins Compact" data-product-price="119.99" data-in-stock="true">
-                                <div class="product-image fins-image-2"></div>
-                                <h3>Travel Fins Compact</h3>
-                                <p class="product-price">$119.99</p>
-                                <button class="btn-secondary add-to-cart">Add to Cart</button>
-                            </div>
-                            <div class="product-card" data-product-id="17" data-product-name="Freediving Carbon Fins" data-product-price="259.99" data-in-stock="true">
-                                <div class="product-image fins-image-3"></div>
-                                <h3>Freediving Carbon Fins</h3>
-                                <p class="product-price">$259.99</p>
-                                <button class="btn-secondary add-to-cart">Add to Cart</button>
-                            </div>
+                    <div class="product-card" data-product-id="13" data-product-name="Pro Divers Octopus" data-product-price="179.99" data-in-stock="true">
+                        <div class="product-image" style="background-image: url('images/pro-divers-octopus.webp');"></div>
+                        <div class="product-info">
+                            <h3 class="product-title">Pro Divers Octopus</h3>
+                            <p class="product-price">$179.99</p>
+                            <button class="add-to-cart">Add to Cart</button>
                         </div>
                     </div>
-                    
-                    <!-- Dive Computers Category -->
-                    <div class="category-section" id="computers">
-                        <h2 class="category-title">Dive Computers</h2>
-                        <div class="products-grid">
-                            <div class="product-card" data-product-id="4" data-product-name="Dive Computer Pro X" data-product-price="599.99" data-in-stock="true">
-                                <div class="product-image"></div>
-                                <h3>Dive Computer Pro X</h3>
-                                <p class="product-price">$599.99</p>
-                                <button class="btn-secondary add-to-cart">Add to Cart</button>
-                            </div>
-                            <div class="product-card" data-product-id="18" data-product-name="Wrist Dive Computer" data-product-price="399.99" data-in-stock="true">
-                                <div class="product-image comp-image-1"></div>
-                                <h3>Wrist Dive Computer</h3>
-                                <p class="product-price">$399.99</p>
-                                <button class="btn-secondary add-to-cart">Add to Cart</button>
-                            </div>
-                            <div class="product-card" data-product-id="19" data-product-name="Console Computer Combo" data-product-price="499.99" data-in-stock="true">
-                                <div class="product-image comp-image-2"></div>
-                                <h3>Console Computer Combo</h3>
-                                <p class="product-price">$499.99</p>
-                                <button class="btn-secondary add-to-cart">Add to Cart</button>
-                            </div>
-                            <div class="product-card" data-product-id="20" data-product-name="Freediver Computer" data-product-price="349.99" data-in-stock="true">
-                                <div class="product-image comp-image-3"></div>
-                                <h3>Freediver Computer</h3>
-                                <p class="product-price">$349.99</p>
-                                <button class="btn-secondary add-to-cart">Add to Cart</button>
-                            </div>
+                    <div class="product-card" data-product-id="14" data-product-name="Regulator First Stage" data-product-price="249.99" data-in-stock="false">
+                        <div class="product-image" style="background-image: url('images/regulator-first-stage.webp');"></div>
+                        <div class="product-info">
+                            <h3 class="product-title">Regulator First Stage</h3>
+                            <p class="product-price">$249.99</p>
+                            <p class="out-of-stock">Out of Stock</p>
+                            <button class="notify-me">Notify Me</button>
                         </div>
                     </div>
-                    
-                    <!-- Wetsuits Category -->
-                    <div class="category-section" id="wetsuits">
-                        <h2 class="category-title">Wetsuits</h2>
-                        <div class="products-grid">
-                            <div class="product-card" data-product-id="5" data-product-name="Wetsuit Pro Series" data-product-price="299.99" data-in-stock="true">
-                                <div class="product-image"></div>
-                                <h3>Wetsuit Pro Series</h3>
-                                <p class="product-price">$299.99</p>
-                                <button class="btn-secondary add-to-cart">Add to Cart</button>
-                            </div>
-                            <div class="product-card" data-product-id="21" data-product-name="3mm Tropical Wetsuit" data-product-price="229.99" data-in-stock="true">
-                                <div class="product-image suit-image-1"></div>
-                                <h3>3mm Tropical Wetsuit</h3>
-                                <p class="product-price">$229.99</p>
-                                <button class="btn-secondary add-to-cart">Add to Cart</button>
-                            </div>
-                            <div class="product-card" data-product-id="22" data-product-name="7mm Cold Water Suit" data-product-price="399.99" data-in-stock="true">
-                                <div class="product-image suit-image-2"></div>
-                                <h3>7mm Cold Water Suit</h3>
-                                <p class="product-price">$399.99</p>
-                                <button class="btn-secondary add-to-cart">Add to Cart</button>
-                            </div>
-                            <div class="product-card" data-product-id="23" data-product-name="Womens Wetsuit 5mm" data-product-price="279.99" data-in-stock="false">
-                                <div class="product-image suit-image-3"></div>
-                                <h3>Womens Wetsuit 5mm</h3>
-                                <p class="product-price">$279.99</p>
-                                <p class="out-of-stock">Out of Stock</p>
-                                <button class="btn-secondary notify-me">Notify Me</button>
-                            </div>
+                </div>
+            </div>
+            
+            <!-- Fins Category -->
+            <div class="category-section" id="fins">
+                <div class="category-header">
+                    <h2>Fins</h2>
+                </div>
+                <div class="products-grid">
+                    <div class="product-card" data-product-id="3" data-product-name="Pacific Fins - Limited Edition" data-product-price="189.99" data-in-stock="false">
+                        <div class="product-image" style="background-image: url('images/cressi-gara-modular-impulse-spearfishing-fins.webp');"></div>
+                        <div class="product-info">
+                            <h3 class="product-title">Pacific Fins - Limited Edition</h3>
+                            <p class="product-price">$189.99</p>
+                            <p class="out-of-stock">Out of Stock</p>
+                            <button class="notify-me">Notify Me</button>
                         </div>
                     </div>
-                    
-                    <!-- Accessories Category -->
-                    <div class="category-section" id="accessories">
-                        <h2 class="category-title">Accessories</h2>
-                        <div class="products-grid">
-                            <div class="product-card" data-product-id="6" data-product-name="Underwater Camera Kit" data-product-price="449.99" data-in-stock="true">
-                                <div class="product-image"></div>
-                                <h3>Underwater Camera Kit</h3>
-                                <p class="product-price">$449.99</p>
-                                <button class="btn-secondary add-to-cart">Add to Cart</button>
-                            </div>
-                            <div class="product-card" data-product-id="7" data-product-name="Dive Light - Ultra Bright" data-product-price="159.99" data-in-stock="true">
-                                <div class="product-image"></div>
-                                <h3>Dive Light - Ultra Bright</h3>
-                                <p class="product-price">$159.99</p>
-                                <button class="btn-secondary add-to-cart">Add to Cart</button>
-                            </div>
-                            <div class="product-card" data-product-id="8" data-product-name="Dive Knife Titanium" data-product-price="89.99" data-in-stock="false">
-                                <div class="product-image"></div>
-                                <h3>Dive Knife Titanium</h3>
-                                <p class="product-price">$89.99</p>
-                                <p class="out-of-stock">Out of Stock</p>
-                                <button class="btn-secondary notify-me">Notify Me</button>
-                            </div>
-                            <div class="product-card" data-product-id="24" data-product-name="Dive Reel 100m" data-product-price="69.99" data-in-stock="true">
-                                <div class="product-image acc-image-1"></div>
-                                <h3>Dive Reel 100m</h3>
-                                <p class="product-price">$69.99</p>
-                                <button class="btn-secondary add-to-cart">Add to Cart</button>
-                            </div>
+                    <div class="product-card" data-product-id="15" data-product-name="Adjustable Dive Fins" data-product-price="139.99" data-in-stock="true">
+                        <div class="product-image" style="background-image: url('images/adjustable-dive-fins.webp');"></div>
+                        <div class="product-info">
+                            <h3 class="product-title">Adjustable Dive Fins</h3>
+                            <p class="product-price">$139.99</p>
+                            <button class="add-to-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                    <div class="product-card" data-product-id="16" data-product-name="Travel Fins Compact" data-product-price="119.99" data-in-stock="true">
+                        <div class="product-image" style="background-image: url('images/travel-fins-compact.webp');"></div>
+                        <div class="product-info">
+                            <h3 class="product-title">Travel Fins Compact</h3>
+                            <p class="product-price">$119.99</p>
+                            <button class="add-to-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                    <div class="product-card" data-product-id="17" data-product-name="Freediving Carbon Fins" data-product-price="259.99" data-in-stock="true">
+                        <div class="product-image" style="background-image: url('images/freediving-carbon-fins.webp');"></div>
+                        <div class="product-info">
+                            <h3 class="product-title">Freediving Carbon Fins</h3>
+                            <p class="product-price">$259.99</p>
+                            <button class="add-to-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dive Computers Category -->
+            <div class="category-section" id="computers">
+                <div class="category-header">
+                    <h2>Dive Computers</h2>
+                </div>
+                <div class="products-grid">
+                    <div class="product-card" data-product-id="4" data-product-name="Dive Computer Pro X" data-product-price="599.99" data-in-stock="true">
+                        <div class="product-image" style="background-image: url('images/mares-genius-dive-computer.webp');"></div>
+                        <div class="product-info">
+                            <h3 class="product-title">Dive Computer Pro X</h3>
+                            <p class="product-price">$599.99</p>
+                            <button class="add-to-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                    <div class="product-card" data-product-id="18" data-product-name="Wrist Dive Computer" data-product-price="399.99" data-in-stock="true">
+                        <div class="product-image" style="background-image: url('images/wrist-dive-computer.webp');"></div>
+                        <div class="product-info">
+                            <h3 class="product-title">Wrist Dive Computer</h3>
+                            <p class="product-price">$399.99</p>
+                            <button class="add-to-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                    <div class="product-card" data-product-id="19" data-product-name="Console Computer Combo" data-product-price="499.99" data-in-stock="true">
+                        <div class="product-image" style="background-image: url('images/console-computer-combo.webp');"></div>
+                        <div class="product-info">
+                            <h3 class="product-title">Console Computer Combo</h3>
+                            <p class="product-price">$499.99</p>
+                            <button class="add-to-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                    <div class="product-card" data-product-id="20" data-product-name="Freediver Computer" data-product-price="349.99" data-in-stock="true">
+                        <div class="product-image" style="background-image: url('images/freediver-computer.webp');"></div>
+                        <div class="product-info">
+                            <h3 class="product-title">Freediver Computer</h3>
+                            <p class="product-price">$349.99</p>
+                            <button class="add-to-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Wetsuits Category -->
+            <div class="category-section" id="wetsuits">
+                <div class="category-header">
+                    <h2>Wetsuits</h2>
+                </div>
+                <div class="products-grid">
+                    <div class="product-card" data-product-id="5" data-product-name="Wetsuit Pro Series" data-product-price="299.99" data-in-stock="true">
+                        <div class="product-image" style="background-image: url('images/mares-pioneer-7mm-wetsuit.webp');"></div>
+                        <div class="product-info">
+                            <h3 class="product-title">Wetsuit Pro Series</h3>
+                            <p class="product-price">$299.99</p>
+                            <button class="add-to-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                    <div class="product-card" data-product-id="21" data-product-name="3mm Tropical Wetsuit" data-product-price="229.99" data-in-stock="true">
+                        <div class="product-image" style="background-image: url('images/3mm-tropical-wetsuit.webp');"></div>
+                        <div class="product-info">
+                            <h3 class="product-title">3mm Tropical Wetsuit</h3>
+                            <p class="product-price">$229.99</p>
+                            <button class="add-to-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                    <div class="product-card" data-product-id="22" data-product-name="7mm Cold Water Suit" data-product-price="399.99" data-in-stock="true">
+                        <div class="product-image" style="background-image: url('images/7mm-cold-water-suit.webp');"></div>
+                        <div class="product-info">
+                            <h3 class="product-title">7mm Cold Water Suit</h3>
+                            <p class="product-price">$399.99</p>
+                            <button class="add-to-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                    <div class="product-card" data-product-id="23" data-product-name="Womens Wetsuit 5mm" data-product-price="279.99" data-in-stock="false">
+                        <div class="product-image" style="background-image: url('images/womens-wetsuit-5mm.webp');"></div>
+                        <div class="product-info">
+                            <h3 class="product-title">Womens Wetsuit 5mm</h3>
+                            <p class="product-price">$279.99</p>
+                            <p class="out-of-stock">Out of Stock</p>
+                            <button class="notify-me">Notify Me</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Accessories Category -->
+            <div class="category-section" id="accessories">
+                <div class="category-header">
+                    <h2>Accessories</h2>
+                </div>
+                <div class="products-grid">
+                    <div class="product-card" data-product-id="6" data-product-name="Underwater Camera Kit" data-product-price="449.99" data-in-stock="true">
+                        <div class="product-image" style="background-image: url('images/underwater-camera-housing-kit.webp');"></div>
+                        <div class="product-info">
+                            <h3 class="product-title">Underwater Camera Kit</h3>
+                            <p class="product-price">$449.99</p>
+                            <button class="add-to-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                    <div class="product-card" data-product-id="7" data-product-name="Dive Light - Ultra Bright" data-product-price="159.99" data-in-stock="true">
+                        <div class="product-image" style="background-image: url('images/dive-light-ultra-bright.webp');"></div>
+                        <div class="product-info">
+                            <h3 class="product-title">Dive Light - Ultra Bright</h3>
+                            <p class="product-price">$159.99</p>
+                            <button class="add-to-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                    <div class="product-card" data-product-id="8" data-product-name="Dive Knife Titanium" data-product-price="89.99" data-in-stock="false">
+                        <div class="product-image" style="background-image: url('images/dive-knife-titanium.webp');"></div>
+                        <div class="product-info">
+                            <h3 class="product-title">Dive Knife Titanium</h3>
+                            <p class="product-price">$89.99</p>
+                            <p class="out-of-stock">Out of Stock</p>
+                            <button class="notify-me">Notify Me</button>
+                        </div>
+                    </div>
+                    <div class="product-card" data-product-id="24" data-product-name="Dive Reel 100m" data-product-price="69.99" data-in-stock="true">
+                        <div class="product-image" style="background-image: url('images/dive-reel-100m.webp');"></div>
+                        <div class="product-info">
+                            <h3 class="product-title">Dive Reel 100m</h3>
+                            <p class="product-price">$69.99</p>
+                            <button class="add-to-cart">Add to Cart</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
     <footer>
         <div class="container">
@@ -325,9 +399,6 @@
         </div>
     </footer>
 
-    <!-- Include all the modal components from index.html -->
-    <!-- The same modals from index.html should be included here -->
-    
     <!-- Modal Components -->
     <div class="modal" id="login-modal">
         <div class="modal-content">
@@ -473,7 +544,8 @@
             <span class="close-modal">&times;</span>
             <div class="confirmation-message">
                 <h2>Thank You!</h2>
-                <p id="confirmation-text"></p>
+                <p id="confirmation-text">
+                    <p id="confirmation-text"></p>
                 <button class="btn-primary btn-full close-confirmation">Continue Shopping</button>
             </div>
         </div>
