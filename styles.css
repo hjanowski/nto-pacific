@@ -208,65 +208,31 @@ nav a:hover, nav a.active {
     color: var(--sand);
 }
     /* Product Grid */
-.featured-products {
-    padding: 4rem 0;
-}
+/* Product Images CSS */
 
-.section-title {
-    text-align: center;
-    margin-bottom: 2.5rem;
-    color: var(--deep-blue);
-}
-
-.products-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 2rem;
-}
-
-.product-card {
-    background-color: var(--white);
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    transition: transform 0.3s ease;
-}
-
-.product-card:hover {
-    transform: translateY(-5px);
-}
-
-.product-image {
-    height: 200px;
-    background-color: var(--light-gray);
-    background-size: cover;
+/* Elite Pro Diving Mask */
+.product-card:nth-child(1) .product-image {
+    background-image: url('https://images.pexels.com/photos/3101501/pexels-photo-3101501.jpeg?auto=compress&cs=tinysrgb&w=600');
     background-position: center;
 }
 
-.product-card h3 {
-    padding: 1rem 1rem 0.5rem;
-    font-size: var(--fs-sm);
+/* Aqua Lung Regulator */
+.product-card:nth-child(2) .product-image {
+    background-image: url('https://images.pexels.com/photos/1645028/pexels-photo-1645028.jpeg?auto=compress&cs=tinysrgb&w=600');
+    background-position: center;
 }
 
-.product-price {
-    padding: 0 1rem;
-    font-weight: 600;
-    color: var(--medium-blue);
-    margin-bottom: 0.5rem;
+/* Pacific Fins - Limited Edition */
+.product-card:nth-child(3) .product-image {
+    background-image: url('https://images.pexels.com/photos/1645029/pexels-photo-1645029.jpeg?auto=compress&cs=tinysrgb&w=600');
+    background-position: center top;
 }
 
-.product-card button {
-    margin: 0 1rem 1rem;
-    width: calc(100% - 2rem);
+/* Dive Computer Pro X */
+.product-card:nth-child(4) .product-image {
+    background-image: url('https://images.pexels.com/photos/1813157/pexels-photo-1813157.jpeg?auto=compress&cs=tinysrgb&w=600');
+    background-position: center;
 }
-
-.out-of-stock {
-    color: #e74c3c;
-    font-weight: 500;
-    padding: 0 1rem;
-    margin-bottom: 0.5rem;
-}
-
 /* Collection Banner */
 .collection-banner {
     background: linear-gradient(90deg, rgba(28, 79, 107, 0.9), rgba(10, 44, 60, 0.7)), url('https://via.placeholder.com/1920x400');
