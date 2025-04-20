@@ -123,6 +123,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Enhance the order summary display after updating the total
                 enhanceOrderSummary();
+                
+                // Restructure the checkout modal to ensure visibility
+                restructureCheckoutModal();
             }
             
             // Pre-fill shipping name with user's name if available
@@ -281,6 +284,31 @@ document.addEventListener('DOMContentLoaded', () => {
         checkoutForm.reset();
     });
 });
+
+// ===== RESTRUCTURE CHECKOUT MODAL FUNCTION =====
+function restructureCheckoutModal() {
+    // Get the checkout form element
+    const checkoutForm = document.getElementById('checkout-form');
+    if (!checkoutForm) return;
+    
+    // Get the order summary element
+    const orderSummary = checkoutForm.querySelector('.order-summary');
+    if (!orderSummary) return;
+    
+    // Move the order summary to the top of the form
+    checkoutForm.prepend(orderSummary);
+    
+    // Make sure the modal has scrolling capability
+    const checkoutModal = document.getElementById('checkout-modal');
+    if (checkoutModal) {
+        const modalContent = checkoutModal.querySelector('.modal-content');
+        if (modalContent) {
+            // Ensure the modal content has scrolling
+            modalContent.style.maxHeight = '85vh';
+            modalContent.style.overflowY = 'auto';
+        }
+    }
+}
 
 // ===== ENHANCED ORDER SUMMARY FUNCTION =====
 function enhanceOrderSummary() {
