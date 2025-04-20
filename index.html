@@ -1,277 +1,55 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NTO Pacific | Premium Diving Equipment</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="script.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NTO Pacific</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <header>
-        <div class="container">
-            <div class="logo">
-                <h1>NTO Pacific</h1>
-                <p>Premium Diving Equipment</p>
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="#" class="active">Home</a></li>
-                    <li><a href="#">Shop</a></li>
-                    <li><a href="#">About</a></li>
-                    <li><a href="#">Contact</a></li>
-                </ul>
-            </nav>
-            <div class="user-actions">
-                <button id="cart-btn" class="btn-icon"><span class="cart-count">0</span>🛒</button>
-                <button id="login-btn" class="btn-primary">Login</button>
-            </div>
-        </div>
-    </header>
+  <header>
+    <div class="logo">NTO Pacific</div>
+    <nav>
+      <a href="#login">Login</a>
+      <a href="#shop">Shop</a>
+    </nav>
+  </header>
 
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h2>Explore the Depths</h2>
-                <p>Professional diving equipment for every adventure</p>
-                <button class="btn-primary btn-large">Shop Now</button>
-            </div>
-        </div>
+  <main>
+    <!-- 1. Signup/Login -->
+    <section id="login">
+      <h2>Login / Signup</h2>
+      <form id="auth-form">
+        <input type="email" id="email" placeholder="Email" required />
+        <input type="password" id="password" placeholder="Password" required />
+        <button type="submit">Submit</button>
+      </form>
     </section>
 
-    <section class="featured-products">
-        <div class="container">
-            <h2 class="section-title">Featured Equipment</h2>
-            <div class="products-grid">
-                <div class="product-card" data-product-id="1" data-product-name="Elite Pro Diving Mask" data-product-price="129.99" data-in-stock="true">
-                    <div class="product-image"></div>
-                    <h3>Elite Pro Diving Mask</h3>
-                    <p class="product-price">$129.99</p>
-                    <button class="btn-secondary add-to-cart">Add to Cart</button>
-                </div>
-                <div class="product-card" data-product-id="2" data-product-name="Aqua Lung Regulator" data-product-price="349.99" data-in-stock="true">
-                    <div class="product-image"></div>
-                    <h3>Aqua Lung Regulator</h3>
-                    <p class="product-price">$349.99</p>
-                    <button class="btn-secondary add-to-cart">Add to Cart</button>
-                </div>
-                <div class="product-card" data-product-id="3" data-product-name="Pacific Fins - Limited Edition" data-product-price="189.99" data-in-stock="false">
-                    <div class="product-image"></div>
-                    <h3>Pacific Fins - Limited Edition</h3>
-                    <p class="product-price">$189.99</p>
-                    <p class="out-of-stock">Out of Stock</p>
-                    <button class="btn-secondary notify-me">Notify Me</button>
-                </div>
-                <div class="product-card" data-product-id="4" data-product-name="Dive Computer Pro X" data-product-price="599.99" data-in-stock="true">
-                    <div class="product-image"></div>
-                    <h3>Dive Computer Pro X</h3>
-                    <p class="product-price">$599.99</p>
-                    <button class="btn-secondary add-to-cart">Add to Cart</button>
-                </div>
-            </div>
+    <!-- 2. Shop & 3. Out‑of‑Stock -->
+    <section id="shop">
+      <h2>Shop Diving Gear</h2>
+      <div class="products">
+        <div class="product">
+          <img src="mask.jpg" alt="Dive Mask" />
+          <h3>Dive Mask</h3>
+          <p>$50</p>
+          <button class="buy-btn">Add to Cart</button>
         </div>
+
+        <div class="product out-of-stock">
+          <img src="fins.jpg" alt="Dive Fins" />
+          <h3>Dive Fins</h3>
+          <p>$70</p>
+          <button class="order-btn">Notify Me When Available</button>
+        </div>
+      </div>
+
+      <button id="checkout-btn">Checkout</button>
     </section>
+  </main>
 
-    <section class="collection-banner">
-        <div class="container">
-            <div class="banner-content">
-                <h2>New 2025 Collection</h2>
-                <p>Engineered for the deepest dives</p>
-                <button class="btn-primary">Explore Collection</button>
-            </div>
-        </div>
-    </section>
-
-    <footer>
-        <div class="container">
-            <div class="footer-columns">
-                <div class="footer-column">
-                    <h3>NTO Pacific</h3>
-                    <p>Premium diving equipment for professional and recreational divers since 2010.</p>
-                </div>
-                <div class="footer-column">
-                    <h3>Quick Links</h3>
-                    <ul>
-                        <li><a href="#">Home</a></li>
-                        <li><a href="#">Shop</a></li>
-                        <li><a href="#">About</a></li>
-                        <li><a href="#">Contact</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Customer Service</h3>
-                    <ul>
-                        <li><a href="#">Shipping</a></li>
-                        <li><a href="#">Returns</a></li>
-                        <li><a href="#">FAQ</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Newsletter</h3>
-                    <p>Subscribe for updates on new products and promotions</p>
-                    <form id="newsletter-form">
-                        <input type="email" placeholder="Your email">
-                        <button type="submit" class="btn-primary">Subscribe</button>
-                    </form>
-                </div>
-            </div>
-            <div class="copyright">
-                <p>© 2025 NTO Pacific. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Modal Components -->
-    <div class="modal" id="login-modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>Login to NTO Pacific</h2>
-            <form id="login-form">
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-                <button type="submit" class="btn-primary btn-full">Login</button>
-            </form>
-            <p class="form-footer">Don't have an account? <a href="#" id="show-signup">Sign up</a></p>
-        </div>
-    </div>
-
-    <div class="modal" id="signup-modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>Create Account</h2>
-            <form id="signup-form">
-                <div class="form-group">
-                    <label for="name">Full Name</label>
-                    <input type="text" id="name" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label for="signup-email">Email</label>
-                    <input type="email" id="signup-email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="signup-password">Password</label>
-                    <input type="password" id="signup-password" name="password" required>
-                </div>
-                <div class="form-group">
-                    <label for="confirm-password">Confirm Password</label>
-                    <input type="password" id="confirm-password" name="confirm-password" required>
-                </div>
-                <button type="submit" class="btn-primary btn-full">Create Account</button>
-            </form>
-            <p class="form-footer">Already have an account? <a href="#" id="show-login">Login</a></p>
-        </div>
-    </div>
-
-    <div class="modal" id="cart-modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>Your Cart</h2>
-            <div id="cart-items">
-                <!-- Cart items will be added here dynamically -->
-            </div>
-            <div class="cart-summary">
-                <p>Subtotal: <span id="cart-subtotal">$0.00</span></p>
-                <p>Shipping: <span id="cart-shipping">$0.00</span></p>
-                <p>Total: <span id="cart-total">$0.00</span></p>
-            </div>
-            <button id="checkout-btn" class="btn-primary btn-full">Proceed to Checkout</button>
-        </div>
-    </div>
-
-    <div class="modal" id="checkout-modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>Checkout</h2>
-            <form id="checkout-form">
-                <div class="form-section">
-                    <h3>Shipping Information</h3>
-                    <div class="form-group">
-                        <label for="shipping-name">Full Name</label>
-                        <input type="text" id="shipping-name" name="shipping-name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="shipping-address">Address</label>
-                        <input type="text" id="shipping-address" name="shipping-address" required>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="shipping-city">City</label>
-                            <input type="text" id="shipping-city" name="shipping-city" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="shipping-zip">ZIP Code</label>
-                            <input type="text" id="shipping-zip" name="shipping-zip" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="shipping-country">Country</label>
-                        <select id="shipping-country" name="shipping-country" required>
-                            <option value="">Select Country</option>
-                            <option value="US">United States</option>
-                            <option value="CA">Canada</option>
-                            <option value="AU">Australia</option>
-                            <option value="UK">United Kingdom</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-section">
-                    <h3>Payment Information</h3>
-                    <div class="form-group">
-                        <label for="card-number">Card Number</label>
-                        <input type="text" id="card-number" name="card-number" placeholder="XXXX XXXX XXXX XXXX" required>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="expiry-date">Expiry Date</label>
-                            <input type="text" id="expiry-date" name="expiry-date" placeholder="MM/YY" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="cvv">CVV</label>
-                            <input type="text" id="cvv" name="cvv" placeholder="XXX" required>
-                        </div>
-                    </div>
-                </div>
-                <div class="order-summary">
-                    <h3>Order Summary</h3>
-                    <p>Total: <span id="order-total">$0.00</span></p>
-                </div>
-                <button type="submit" class="btn-primary btn-full">Complete Purchase</button>
-            </form>
-        </div>
-    </div>
-
-    <div class="modal" id="notify-modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>Notify Me When Available</h2>
-            <p id="notify-product-name">Pacific Fins - Limited Edition</p>
-            <form id="notify-form">
-                <div class="form-group">
-                    <label for="notify-email">Email</label>
-                    <input type="email" id="notify-email" name="notify-email" required>
-                </div>
-                <button type="submit" class="btn-primary btn-full">Notify Me</button>
-            </form>
-        </div>
-    </div>
-
-    <div class="modal" id="confirmation-modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <div class="confirmation-message">
-                <h2>Thank You!</h2>
-                <p id="confirmation-text"></p>
-                <button class="btn-primary btn-full close-confirmation">Continue Shopping</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="overlay"></div>
+  <script src="script.js"></script>
 </body>
 </html>
