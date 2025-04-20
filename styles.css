@@ -179,7 +179,7 @@ nav a:hover, nav a.active {
 /* Hero Section */
 .hero {
     background: linear-gradient(rgba(10, 44, 60, 0.5), rgba(28, 79, 107, 0.7)), 
-                url('https://images.pexels.com/photos/869258/pexels-photo-869258.jpeg?auto=compress&cs=tinysrgb&w=1920');
+                url('https://images.pexels.com/photos/3046637/pexels-photo-3046637.jpeg?auto=compress&cs=tinysrgb&w=1920');
     background-size: cover;
     background-position: center;
     color: var(--white);
