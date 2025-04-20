@@ -176,8 +176,6 @@ nav a:hover, nav a.active {
     align-items: center;
     justify-content: center;
 }
-
-/* Hero Section */
 /* Updated Hero Section */
 .hero {
     background: linear-gradient(rgba(10, 44, 60, 0.5), rgba(28, 79, 107, 0.6)), 
@@ -227,7 +225,8 @@ nav a:hover, nav a.active {
         padding: 1.5rem;
         margin: 0 1rem;
     }
-/* Product Grid */
+}
+    /* Product Grid */
 .featured-products {
     padding: 4rem 0;
 }
