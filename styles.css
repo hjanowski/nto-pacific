@@ -208,30 +208,71 @@ nav a:hover, nav a.active {
     color: var(--sand);
 }
     /* Product Grid */
-/* Product Images CSS */
+/* Product Card Styles - Make sure these styles are preserved */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 2rem;
+}
 
-/* Elite Pro Diving Mask */
+.product-card {
+    background-color: var(--white);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+.product-image {
+    height: 200px;
+    background-color: var(--light-gray);
+    background-size: cover;
+    background-position: center;
+}
+
+.product-card h3 {
+    padding: 1rem 1rem 0.5rem;
+    font-size: var(--fs-sm);
+}
+
+.product-price {
+    padding: 0 1rem;
+    font-weight: 600;
+    color: var(--medium-blue);
+    margin-bottom: 0.5rem;
+}
+
+.product-card button {
+    margin: 0 1rem 1rem;
+    width: calc(100% - 2rem);
+}
+
+.out-of-stock {
+    color: #e74c3c;
+    font-weight: 500;
+    padding: 0 1rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Product Images - Updated with direct image URLs */
 .product-card:nth-child(1) .product-image {
-    background-image: url('https://images.pexels.com/photos/3101501/pexels-photo-3101501.jpeg?auto=compress&cs=tinysrgb&w=600');
-    background-position: center;
+    background-image: url('https://i.imgur.com/XvEmLSB.jpg');
 }
 
-/* Aqua Lung Regulator */
 .product-card:nth-child(2) .product-image {
-    background-image: url('https://images.pexels.com/photos/1645028/pexels-photo-1645028.jpeg?auto=compress&cs=tinysrgb&w=600');
-    background-position: center;
+    background-image: url('https://i.imgur.com/2oWQN5G.jpg');
 }
 
-/* Pacific Fins - Limited Edition */
 .product-card:nth-child(3) .product-image {
-    background-image: url('https://images.pexels.com/photos/1645029/pexels-photo-1645029.jpeg?auto=compress&cs=tinysrgb&w=600');
-    background-position: center top;
+    background-image: url('https://i.imgur.com/UQG8FuL.jpg');
 }
 
-/* Dive Computer Pro X */
 .product-card:nth-child(4) .product-image {
-    background-image: url('https://images.pexels.com/photos/1813157/pexels-photo-1813157.jpeg?auto=compress&cs=tinysrgb&w=600');
-    background-position: center;
+    background-image: url('https://i.imgur.com/Vw2N3ER.jpg');
 }
 /* Collection Banner */
 .collection-banner {
