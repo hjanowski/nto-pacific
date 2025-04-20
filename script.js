@@ -1,62 +1,34 @@
-// Main JavaScript for NTO Pacific website
+// script.js
 
-// Global state
-const state = {
-    cart: [],
-    cartCount: 0,
-    cartTotal: 0,
-    currentUser: null,
-    currentProductNotify: null
-};
+// Generic event‑tracker stub; replace with your analytics SDK call.
+function trackEvent(type, details) {
+  console.log(`[TRACK] ${type}`, details);
+  // e.g. analytics.track(type, details);
+}
 
-// DOM Elements
-document.addEventListener('DOMContentLoaded', () => {
-    // Initialize elements
-    const loginBtn = document.getElementById('login-btn');
-    const cartBtn = document.getElementById('cart-btn');
-    const modals = document.querySelectorAll('.modal');
-    const closeModalButtons = document.querySelectorAll('.close-modal');
-    const overlay = document.querySelector('.overlay');
-    const showSignupLink = document.getElementById('show-signup');
-    const showLoginLink = document.getElementById('show-login');
-    const addToCartButtons = document.querySelectorAll('.add-to-cart');
-    const notifyButtons = document.querySelectorAll('.notify-me');
-    const checkoutBtn = document.getElementById('checkout-btn');
-    const closeConfirmationButtons = document.querySelectorAll('.close-confirmation');
+// 1. Capture login/signup
+document.getElementById('auth-form')
+  .addEventListener('submit', function(e) {
+    e.preventDefault();
+    const email = e.target.email.value;
+    trackEvent('signup_login', { email });
+    // …your auth logic here…
+    alert('Thanks! Check console for tracked event.');
+  });
 
-    // Forms
-    const loginForm = document.getElementById('login-form');
-    const signupForm = document.getElementById('signup-form');
-    const checkoutForm = document.getElementById('checkout-form');
-    const notifyForm = document.getElementById('notify-form');
-    const newsletterForm = document.getElementById('newsletter-form');
+// 2. Capture checkout/purchase
+document.getElementById('checkout-btn')
+  .addEventListener('click', function() {
+    // In a real shop you'd sum cart items; here we hard‑code:
+    const cartValue = 120; 
+    trackEvent('purchase', { cartValue });
+    alert(`Purchase tracked: $${cartValue}`);
+  });
 
-    // Initialize event tracking
-    initializeEventTracking();
-
-    // Event Listeners
-    loginBtn.addEventListener('click', () => {
-        openModal('login-modal');
-        trackEvent('login_attempt', { source: 'header' });
-    });
-
-    cartBtn.addEventListener('click', () => {
-        openModal('cart-modal');
-        updateCartDisplay();
-    });
-
-    showSignupLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        closeModal('login-modal');
-        openModal('signup-modal');
-    });
-
-    showLoginLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        closeModal('signup-modal');
-        openModal('login-modal');
-    });
-
-    closeModalButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            close
+// 3. Capture out‑of‑stock notifications
+document.querySelectorAll('.order-btn')
+  .forEach(btn => btn.addEventListener('click', function() {
+    const product = this.closest('.product').querySelector('h3').innerText;
+    trackEvent('out_of_stock_order', { product });
+    alert(`We'll notify you when "${product}" is back in stock.`);
+  }));
