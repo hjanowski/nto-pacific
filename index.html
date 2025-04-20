@@ -35,7 +35,7 @@
             <div class="hero-content">
                 <h2>Explore the Depths</h2>
                 <p>Professional diving equipment for every adventure</p>
-                <button class="btn-primary btn-large">Shop Now</button>
+               <button class="btn-primary btn-large" id="shop-now-btn">Shop Now</button>
             </div>
         </div>
     </section>
@@ -274,5 +274,16 @@
     </div>
 
     <div class="overlay"></div>
+    <script>
+    // Connect the "Shop Now" button to the catalog page
+    document.addEventListener('DOMContentLoaded', () => {
+        const shopNowBtn = document.getElementById('shop-now-btn');
+        if (shopNowBtn) {
+            shopNowBtn.addEventListener('click', () => {
+                window.location.href = 'catalog.html';
+            });
+        }
+    });
+</script>
 </body>
 </html>
