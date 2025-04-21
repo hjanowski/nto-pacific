@@ -138,10 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     
-    // Update cart count and total
-    state.cartCount = state.cart.reduce((total, item) => total + item.quantity, 0);
-    state.cartTotal = state.cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-    
     // Track the event in Salesforce
     if (typeof SalesforceInteractions !== 'undefined') {
         SalesforceInteractions.sendEvent({
