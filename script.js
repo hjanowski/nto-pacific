@@ -128,14 +128,54 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Add to cart functionality
-    addToCartButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            const productCard = e.target.closest('.product-card');
-            if (productCard) {
-                addToCart(productCard);
-            }
+   function addToCart(productCard) {
+    const productId = productCard.dataset.productId;
+    const productName = productCard.dataset.productName;
+    const productPrice = parseFloat(productCard.dataset.productPrice);
+    
+    // Check if product is already in cart
+    const existingProduct = state.cart.find(item => item.id === productId);
+    
+    if (existingProduct) {
+        // Increment quantity
+        existingProduct.quantity += 1;
+    } else {
+        // Add new product to cart
+        state.cart.push({
+            id: productId,
+            name: productName,
+            price: productPrice,
+            quantity: 1
         });
-    });
+    }
+    
+    // Update cart count and total
+    state.cartCount = state.cart.reduce((total, item) => total + item.quantity, 0);
+    state.cartTotal = state.cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+    
+    // NEW CODE: Track the event in Salesforce
+    if (typeof SalesforceInteractions !== 'undefined') {
+        SalesforceInteractions.sendEvent({
+          interaction: {
+            name: "Campaigns Events",
+            eventType: "campaignsEvents",
+            campaignName: "Product Interaction",
+            campaignSource: "Website",
+            campaignContent: "Add to Cart",
+            custom1: "product_action",
+            custom2: "add_to_cart", 
+            custom3: productPrice
+          }
+        });
+        console.log('Add to cart event tracked:', productName, productPrice);
+    }
+    
+    // Update UI
+    updateCartCount();
+    
+    // Show confirmation
+    showConfirmation(`${productName} has been added to your cart.`);
+}
 
     // Notify me functionality
     notifyButtons.forEach(button => {
