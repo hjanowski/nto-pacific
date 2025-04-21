@@ -79,7 +79,7 @@
 }
 
 .team-photo {
-    height: 220px;  /* Changed from 300px to 220px */
+    height: 220px;
     background-size: cover;
     background-position: center;
     background-color: #f5f5f5;
