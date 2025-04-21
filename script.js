@@ -128,32 +128,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Add to cart functionality
-   function addToCart(productCard) {
-    const productId = productCard.dataset.productId;
-    const productName = productCard.dataset.productName;
-    const productPrice = parseFloat(productCard.dataset.productPrice);
-    
-    // Check if product is already in cart
-    const existingProduct = state.cart.find(item => item.id === productId);
-    
-    if (existingProduct) {
-        // Increment quantity
-        existingProduct.quantity += 1;
-    } else {
-        // Add new product to cart
-        state.cart.push({
-            id: productId,
-            name: productName,
-            price: productPrice,
-            quantity: 1
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            const productCard = e.target.closest('.product-card');
+            if (productCard) {
+                addToCart(productCard);
+            }
         });
-    }
+    });
+
     
     // Update cart count and total
     state.cartCount = state.cart.reduce((total, item) => total + item.quantity, 0);
     state.cartTotal = state.cart.reduce((total, item) => total + (item.price * item.quantity), 0);
     
-    // NEW CODE: Track the event in Salesforce
+    // Track the event in Salesforce
     if (typeof SalesforceInteractions !== 'undefined') {
         SalesforceInteractions.sendEvent({
           interaction: {
