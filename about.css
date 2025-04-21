@@ -80,12 +80,11 @@
 
 /* Team Member Images - Standardized size */
 .team-img {
-    width: 100% !important;
-    height: 220px !important;
-    object-fit: cover !important;
-    object-position: center !important;
-    display: block !important;
-    max-height: 220px !important;
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    object-position: center;
+    display: block;
 }
 
 .team-member h3 {
