@@ -1,3 +1,24 @@
+// Initialize Salesforce Interactions with consent
+document.addEventListener('DOMContentLoaded', () => {
+    // Check if SalesforceInteractions is available
+    if (typeof SalesforceInteractions !== 'undefined') {
+        SalesforceInteractions.init({
+            consents: [
+                {
+                    purpose: SalesforceInteractions.ConsentPurpose.Tracking,
+                    provider: "OneTrust",
+                    status: SalesforceInteractions.ConsentStatus.OptIn
+                }
+            ]
+        });
+        console.log('Salesforce Interactions initialized with consent');
+    } else {
+        console.warn('Salesforce Interactions not available');
+    }
+});
+
+// Rest of your existing script.js code follows...
+
 // Complete script.js file with added authentication functionality
 
 // Global state
