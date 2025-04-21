@@ -165,3 +165,6 @@
         margin-right: auto;
     }
 }
+.team-member .team-photo {
+  height: 220px !important;
+}
