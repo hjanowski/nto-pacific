@@ -91,20 +91,6 @@
     object-position: center;
     display: block;
 }
-
-/* Placeholder image styling - replace with actual images */
-#team-photo-1 {
-    background-image: url('images/Hadas_Yaniv.png');
-}
-
-#team-photo-2 {
-    background-image: url('images/team-2.jpg');
-}
-
-#team-photo-3 {
-    background-image: url('images/team-3.jpg');
-}
-
 .team-member h3 {
     color: #1c4f6b;
     margin: 20px 20px 5px;
