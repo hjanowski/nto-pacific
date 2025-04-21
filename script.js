@@ -138,30 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     
-    // Track the event in Salesforce
-    if (typeof SalesforceInteractions !== 'undefined') {
-        SalesforceInteractions.sendEvent({
-          interaction: {
-            name: "Campaigns Events",
-            eventType: "campaignsEvents",
-            campaignName: "Product Interaction",
-            campaignSource: "Website",
-            campaignContent: "Add to Cart",
-            custom1: "product_action",
-            custom2: "add_to_cart", 
-            custom3: productPrice
-          }
-        });
-        console.log('Add to cart event tracked:', productName, productPrice);
-    }
-    
-    // Update UI
-    updateCartCount();
-    
-    // Show confirmation
-    showConfirmation(`${productName} has been added to your cart.`);
-}
-
     // Notify me functionality
     notifyButtons.forEach(button => {
         button.addEventListener('click', (e) => {
