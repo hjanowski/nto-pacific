@@ -274,7 +274,6 @@
 
     <div class="overlay"></div>
     <script>
-        alert(1)
     // Connect the "Shop Now" button to the catalog page
     document.addEventListener('DOMContentLoaded', () => {
         const shopNowBtn = document.getElementById('shop-now-btn');
@@ -287,8 +286,15 @@
 </script>
     <script src="https://cdn.c360a.salesforce.com/beacon/c360a/233a8f36-3f93-4e01-84e5-c210837a6c97/scripts/c360a.min.js"></script>
     <script>
-        alert(2)
-SalesforceInteractions.init({
+    // Check if user is already logged in
+    const currentUser = localStorage.getItem('ntoCurrentUser');
+    if (currentUser) {
+        const currentUser = JSON.parse(currentUser);
+        const Firstname=currentUser.split(" ")[0];
+        const Lastname=currentUser.split(" ")[1];
+        const Email=currentUser.email;
+
+        SalesforceInteractions.init({
     consents: [{
         provider: "CampaignAttribution",
         purpose: "Tracking",
@@ -302,11 +308,13 @@ SalesforceInteractions.init({
     user: {
         attributes: {
             eventType: 'identity',
-            firstName: 'James',
-            lastName: 'Webb',
-            email: 'amer_nb@salesforce.com',
+            firstName: Firstname,
+            lastName: Lastname,
+            email: Email,
             isAnonymous: 0
         }
+
+        
     }
 });
     },0)
@@ -314,6 +322,8 @@ SalesforceInteractions.init({
 }).catch(err => {
     console.error('Initialization error:', err);
 });
+
+    }
         
     </script>
 </body>
