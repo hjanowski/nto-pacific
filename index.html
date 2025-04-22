@@ -289,10 +289,10 @@
     // Check if user is already logged in
     const currentUser = localStorage.getItem('ntoCurrentUser');
     if (currentUser) {
-        const currentUser = JSON.parse(currentUser);
-        const Firstname=currentUser.split(" ")[0];
-        const Lastname=currentUser.split(" ")[1];
-        const Email=currentUser.email;
+        const parseduser = JSON.parse(currentUser);
+        const Firstname=parseduser.split(" ")[0];
+        const Lastname=parseduser.split(" ")[1];
+        const Email=parseduser.email;
 
         SalesforceInteractions.init({
     consents: [{
