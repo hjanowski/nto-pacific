@@ -336,6 +336,7 @@
         // Add click event listener to each button
         addToCartButtons.forEach(button => {
             button.addEventListener('click', (event) => {
+                 console.log('Add to Cart button clicked!');
                 // Get the product data from the parent product card
                 const productCard = button.closest('.product-card');
                 const productId = productCard.dataset.productId;
