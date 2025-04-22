@@ -77,20 +77,22 @@
 .team-member:hover {
     transform: translateY(-5px);
 }
-
 /* Team Member Image Container */
 .team-img-container {
     width: 100%;
     height: 220px;
     overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-
 /* Team Member Images - Standardized size */
 .team-img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
+    height: auto;
+    object-fit: contain;
+    object-position: center top;
+    max-height: 220px;
     display: block;
 }
 
