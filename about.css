@@ -159,3 +159,9 @@
         height: 200px;
     }
 }
+/* about-styles.css */
+.team-photo img {
+  height: 220px;
+  width: auto;
+  object-fit: cover; /* if you want to preserve cropping behavior */
+}
