@@ -290,8 +290,8 @@
     const currentUser = localStorage.getItem('ntoCurrentUser');
     if (currentUser) {
         const parseduser = JSON.parse(currentUser);
-        const Firstname=parseduser.split(" ")[0];
-        const Lastname=parseduser.split(" ")[1];
+        const Firstname=parseduser.name.split(" ")[0];
+        const Lastname=parseduser.name.split(" ")[1];
         const Email=parseduser.email;
 
         SalesforceInteractions.init({
