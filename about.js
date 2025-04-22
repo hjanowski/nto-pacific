@@ -42,10 +42,11 @@ document.addEventListener('DOMContentLoaded', () => {
             this.alt = 'Team Member';
         });
         
-        // Add load event to ensure proper sizing
-        img.addEventListener('load', function() {
-            // Once loaded, ensure the image height is correct
-            this.style.height = '220px';
-        });
+     img.addEventListener('load', function() {
+    // Once loaded, ensure the image height is correct
+    this.style.height = '220px';
+    this.style.width = '100%'; // Add width too for consistency
+    this.style.objectFit = 'cover';
+});
     });
 });
