@@ -285,7 +285,7 @@
     });
 </script>
     <script src="https://cdn.c360a.salesforce.com/beacon/c360a/233a8f36-3f93-4e01-84e5-c210837a6c97/scripts/c360a.min.js">
-window.SalesforceInteractions.init({
+SalesforceInteractions.init({
     consents: [{
         provider: "CampaignAttribution",
         purpose: "Tracking",
@@ -295,7 +295,7 @@ window.SalesforceInteractions.init({
     console.log("success")
     setTimeout(() => {
          console.log("Sending Event")
-        window.SalesforceInteractions.sendEvent({
+        SalesforceInteractions.sendEvent({
     user: {
         attributes: {
             eventType: 'identity',
