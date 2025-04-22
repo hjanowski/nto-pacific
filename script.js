@@ -1,54 +1,3 @@
-// Initialize Salesforce Interactions with consent
-document.addEventListener('DOMContentLoaded', () => {
-    // Check if SalesforceInteractions is available
-    if (typeof SalesforceInteractions !== 'undefined') {
-        SalesforceInteractions.init({
-            consents: [
-                {
-                    purpose: SalesforceInteractions.ConsentPurpose.Tracking,
-                    provider: "OneTrust",
-                    status: SalesforceInteractions.ConsentStatus.OptIn
-                }
-            ]
-        });
-        console.log('Salesforce Interactions initialized with consent');
-    } else {
-        console.warn('Salesforce Interactions not available');
-    }
-});
-
-// Add this after your SalesforceInteractions.init code in script.js
-
-function trackCampaignEvent() {
-    // Check if SalesforceInteractions is available
-    if (typeof SalesforceInteractions === 'undefined') return;
-    
-    // Get URL parameters
-    const urlParams = new URLSearchParams(window.location.search);
-    const campaignSource = urlParams.get('utm_source') || 'direct';
-    const campaignName = urlParams.get('utm_campaign') || 'organic';
-    const campaignContent = urlParams.get('utm_content') || '';
-    
-    // Send the campaign event
-    SalesforceInteractions.sendEvent({
-      interaction: {
-        name: "Campaigns Events",
-        eventType: "campaignsEvents",
-        campaignName: campaignName,
-        campaignSource: campaignSource,
-        campaignContent: campaignContent,
-        custom1: window.location.pathname, // current page
-        custom2: "page_visit",
-        custom3: 1
-      }
-    });
-    
-    console.log('Campaign event tracked:', campaignName, campaignSource);
-}
-
-// Call this function when the page loads
-document.addEventListener('DOMContentLoaded', trackCampaignEvent);
-
 // Complete script.js file with added authentication functionality
 
 // Global state
@@ -137,7 +86,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    
     // Notify me functionality
     notifyButtons.forEach(button => {
         button.addEventListener('click', (e) => {
