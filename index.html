@@ -292,7 +292,10 @@ window.SalesforceInteractions.init({
         status: "Opt In"
     }]
 }).then(res => {
-  window.SalesforceInteractions.sendEvent({
+    console.log("success")
+    setTimeout(() => {
+         console.log("Sending Event")
+        window.SalesforceInteractions.sendEvent({
     user: {
         attributes: {
             eventType: 'identity',
@@ -303,6 +306,8 @@ window.SalesforceInteractions.init({
         }
     }
 });
+    },3000)
+  
 }).catch(err => {
     console.error('Initialization error:', err);
 });
