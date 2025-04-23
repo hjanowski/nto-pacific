@@ -283,49 +283,10 @@
             });
         }
     });
-</script>
-    <script src="https://cdn.c360a.salesforce.com/beacon/c360a/233a8f36-3f93-4e01-84e5-c210837a6c97/scripts/c360a.min.js"></script>
-    <script>
-    // Check if user is already logged in
-    const currentUser = localStorage.getItem('ntoCurrentUser');
-    if (currentUser) {
-        const parseduser = JSON.parse(currentUser);
-        const Firstname=parseduser.name.split(" ")[0];
-        const Lastname=parseduser.name.split(" ")[1];
-        const Email=parseduser.email;
-
-        SalesforceInteractions.init({
-    consents: [{
-        provider: "CampaignAttribution",
-        purpose: "Tracking",
-        status: "Opt In"
-    }]
-}).then(res => {
-    console.log("success")
-    setTimeout(() => {
-         console.log("Sending Event")
-        SalesforceInteractions.sendEvent({
-    user: {
-        attributes: {
-            eventType: 'identity',
-            firstName: Firstname,
-            lastName: Lastname,
-            email: Email,
-            isAnonymous: 0
-        }
-
-        
-    }
-});
-    },0)
-  
-}).catch(err => {
-    console.error('Initialization error:', err);
-});
-
-    }
-
- // Define getUTMParameters globally, outside of any event listeners
+</script><!-- Keep your existing script tags and add this complete script block -->
+<script src="https://cdn.c360a.salesforce.com/beacon/c360a/233a8f36-3f93-4e01-84e5-c210837a6c97/scripts/c360a.min.js"></script>
+<script>
+// Define getUTMParameters globally so it's accessible to all functions
 function getUTMParameters() {
     const urlParams = new URLSearchParams(window.location.search);
     return {
@@ -333,6 +294,41 @@ function getUTMParameters() {
         utm_campaign: urlParams.get('utm_campaign') || '',
         utm_content: urlParams.get('utm_content') || ''
     };
+}
+
+// Check if user is already logged in
+const currentUser = localStorage.getItem('ntoCurrentUser');
+if (currentUser) {
+    const parseduser = JSON.parse(currentUser);
+    const Firstname = parseduser.name.split(" ")[0];
+    const Lastname = parseduser.name.split(" ")[1];
+    const Email = parseduser.email;
+
+    SalesforceInteractions.init({
+        consents: [{
+            provider: "CampaignAttribution",
+            purpose: "Tracking",
+            status: "Opt In"
+        }]
+    }).then(res => {
+        console.log("success")
+        setTimeout(() => {
+            console.log("Sending Event")
+            SalesforceInteractions.sendEvent({
+                user: {
+                    attributes: {
+                        eventType: 'identity',
+                        firstName: Firstname,
+                        lastName: Lastname,
+                        email: Email,
+                        isAnonymous: 0
+                    }
+                }
+            });
+        }, 0)
+    }).catch(err => {
+        console.error('Initialization error:', err);
+    });
 }
 
 // Consolidated event handling in a single DOMContentLoaded
@@ -472,8 +468,8 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         console.error('Newsletter form not found in the DOM');
     }
-});       
-    </script>
+});
+</script>
     
 </body>
 </html>
