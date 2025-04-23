@@ -376,6 +376,58 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+        // Newsletter Signup Event Tracking
+document.addEventListener('DOMContentLoaded', () => {
+    // Using the existing getUTMParameters function that's already defined
+
+    // Get the newsletter form
+    const newsletterForm = document.getElementById('newsletter-form');
+    
+    // Add submit event listener to the newsletter form
+    if (newsletterForm) {
+        newsletterForm.addEventListener('submit', (event) => {
+            event.preventDefault(); // Prevent the default form submission
+            console.log('Newsletter form submitted!');
+            
+            // Get the email input value
+            const emailInput = newsletterForm.querySelector('input[type="email"]');
+            const userEmail = emailInput ? emailInput.value : '';
+            
+            // Get UTM parameters from URL
+            const utmParams = getUTMParameters();
+            
+            // Send the "Newsletter Signup" event to Salesforce Interactions
+            window.SalesforceInteractions.sendEvent({
+                interaction: {
+                    name: "Campaigns Events",
+                    eventType: "campaignsEvents",
+                    campaignName: utmParams.utm_campaign,
+                    campaignSource: utmParams.utm_source,
+                    campaignContent: utmParams.utm_content,
+                    custom1: "Newsletter Signup",
+                    custom2: "Homepage Newsletter",
+                    custom3: "Delivery via email"
+                }
+            }).then(res => {
+                console.log('Event sent successfully:', res);
+                console.log(`Newsletter signup: ${userEmail}`);
+                console.log('UTM Parameters:', utmParams);
+                
+                // Clear the form
+                if (emailInput) {
+                    emailInput.value = '';
+                }
+                
+                // Show a confirmation message (you can customize this part)
+                alert('Thank you for subscribing to our newsletter!');
+                
+            }).catch(err => {
+                console.error('Event sending error:', err);
+            });
+        });
+    }
+});
         
     </script>
     
