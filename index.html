@@ -283,8 +283,8 @@
             });
         }
     });
-</script><!-- Keep your existing script tags and add this complete script block -->
-<script src="https://cdn.c360a.salesforce.com/beacon/c360a/233a8f36-3f93-4e01-84e5-c210837a6c97/scripts/c360a.min.js"></script>
+</script>
+    <script src="https://cdn.c360a.salesforce.com/beacon/c360a/233a8f36-3f93-4e01-84e5-c210837a6c97/scripts/c360a.min.js"></script>
 <script>
 // Define getUTMParameters globally so it's accessible to all functions
 function getUTMParameters() {
@@ -377,6 +377,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         return;
                     }
                     
+                    // Create a timestamp for when this action took place
+                    const timestamp = new Date().toISOString();
+                    
                     // Send the "Add to Cart" event to Salesforce Interactions
                     window.SalesforceInteractions.sendEvent({
                         interaction: {
@@ -387,7 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             campaignContent: utmParams.utm_content,
                             custom1: "product_add_to_cart",
                             custom2: productName,
-                            custom3: parseFloat(productPrice)
+                            custom3: timestamp
                         }
                     }).then(res => {
                         console.log('Add to Cart event sent successfully:', res);
@@ -438,6 +441,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 
                 // Send the "Newsletter Signup" event to Salesforce Interactions
+                // Create a timestamp for when this action took place
+                const timestamp = new Date().toISOString();
+                
                 window.SalesforceInteractions.sendEvent({
                     interaction: {
                         name: "Campaigns Events",
@@ -447,7 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         campaignContent: utmParams.utm_content,
                         custom1: "Newsletter Signup",
                         custom2: "Homepage Newsletter",
-                        custom3: "Delivery via email"
+                        custom3: timestamp
                     }
                 }).then(res => {
                     console.log('Newsletter event sent successfully:', res);
