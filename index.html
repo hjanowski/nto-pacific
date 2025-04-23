@@ -332,10 +332,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const urlParams = new URLSearchParams(window.location.search);
         return {
             utm_source: urlParams.get('utm_source') || '',
-            utm_medium: urlParams.get('utm_medium') || '',
             utm_campaign: urlParams.get('utm_campaign') || '',
-            utm_content: urlParams.get('utm_content') || '',
-            utm_term: urlParams.get('utm_term') || ''
+            utm_content: urlParams.get('utm_content') || ''
         };
     }
 
@@ -361,9 +359,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 interaction: {
                     name: "Campaigns Events",
                     eventType: "campaignsEvents",
-                    campaignName: utmParams.utm_campaign || "EMEA_GS_NonBrand_AppExchange_Mod",
-                    campaignSource: utmParams.utm_source || "Meta Ads",
-                    campaignContent: utmParams.utm_content || "Free webinar! Join!",
+                    campaignName: utmParams.utm_campaign,
+                    campaignSource: utmParams.utm_source,
+                    campaignContent: utmParams.utm_content,
                     custom1: "product_add_to_cart",
                     custom2: productName,
                     custom3: parseFloat(productPrice)
