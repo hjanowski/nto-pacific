@@ -284,8 +284,17 @@
         }
     });
 </script>
-    <script src="https://cdn.c360a.salesforce.com/beacon/c360a/233a8f36-3f93-4e01-84e5-c210837a6c97/scripts/c360a.min.js"></script>
+    <!-- Replace your existing script tags with this debugging version -->
+<script src="https://cdn.c360a.salesforce.com/beacon/c360a/233a8f36-3f93-4e01-84e5-c210837a6c97/scripts/c360a.min.js"></script>
 <script>
+// Simple debug function to make logs more visible
+function debugLog(message) {
+    console.log('%c[NTO DEBUG] ' + message, 'background: #f0f0f0; color: #0a66c2; font-weight: bold; padding: 3px 5px; border-radius: 3px;');
+}
+
+// Test logging
+debugLog('Script started - console logging is working');
+
 // Define getUTMParameters globally so it's accessible to all functions
 function getUTMParameters() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -296,70 +305,107 @@ function getUTMParameters() {
     };
 }
 
+// Check if SalesforceInteractions is available
+function checkSalesforceInteractions() {
+    if (typeof window.SalesforceInteractions === 'undefined') {
+        debugLog('⚠️ SalesforceInteractions is NOT available');
+        return false;
+    }
+    
+    if (typeof window.SalesforceInteractions.sendEvent !== 'function') {
+        debugLog('⚠️ SalesforceInteractions.sendEvent is NOT a function');
+        return false;
+    }
+    
+    debugLog('✅ SalesforceInteractions is available and ready');
+    return true;
+}
+
+// Keep track of handler attachment to prevent duplicates
+let handlersAttached = false;
+
 // Check if user is already logged in
 const currentUser = localStorage.getItem('ntoCurrentUser');
 if (currentUser) {
-    const parseduser = JSON.parse(currentUser);
-    const Firstname = parseduser.name.split(" ")[0];
-    const Lastname = parseduser.name.split(" ")[1];
-    const Email = parseduser.email;
+    debugLog('User is logged in, initializing identity');
+    try {
+        const parseduser = JSON.parse(currentUser);
+        const Firstname = parseduser.name.split(" ")[0];
+        const Lastname = parseduser.name.split(" ")[1];
+        const Email = parseduser.email;
 
-    SalesforceInteractions.init({
-        consents: [{
-            provider: "CampaignAttribution",
-            purpose: "Tracking",
-            status: "Opt In"
-        }]
-    }).then(res => {
-        console.log("success")
-        setTimeout(() => {
-            console.log("Sending Event")
-            SalesforceInteractions.sendEvent({
-                user: {
-                    attributes: {
-                        eventType: 'identity',
-                        firstName: Firstname,
-                        lastName: Lastname,
-                        email: Email,
-                        isAnonymous: 0
-                    }
-                }
+        // Check SalesforceInteractions before attempting to use it
+        if (checkSalesforceInteractions()) {
+            SalesforceInteractions.init({
+                consents: [{
+                    provider: "CampaignAttribution",
+                    purpose: "Tracking",
+                    status: "Opt In"
+                }]
+            }).then(res => {
+                debugLog("Initialization successful");
+                setTimeout(() => {
+                    debugLog("Sending identity event");
+                    SalesforceInteractions.sendEvent({
+                        user: {
+                            attributes: {
+                                eventType: 'identity',
+                                firstName: Firstname,
+                                lastName: Lastname,
+                                email: Email,
+                                isAnonymous: 0
+                            }
+                        }
+                    });
+                }, 0);
+            }).catch(err => {
+                debugLog('⚠️ Initialization error: ' + (err.message || err));
             });
-        }, 0)
-    }).catch(err => {
-        console.error('Initialization error:', err);
-    });
+        } else {
+            debugLog('Cannot initialize SalesforceInteractions - not available');
+        }
+    } catch (error) {
+        debugLog('⚠️ Error processing user data: ' + (error.message || error));
+    }
+} else {
+    debugLog('User is not logged in');
 }
 
-// Consolidated event handling in a single DOMContentLoaded
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM fully loaded, initializing all event handlers');
+// Function to attach all event handlers
+function attachEventHandlers() {
+    if (handlersAttached) {
+        debugLog('Event handlers already attached, skipping');
+        return;
+    }
+
+    debugLog('Attaching all event handlers');
     
     // 1. Shop Now button handler
     const shopNowBtn = document.getElementById('shop-now-btn');
     if (shopNowBtn) {
-        console.log('Shop Now button found, attaching event listener');
+        debugLog('Shop Now button found, attaching event listener');
         shopNowBtn.addEventListener('click', () => {
+            debugLog('Shop Now button clicked');
             window.location.href = 'catalog.html';
         });
     } else {
-        console.log('Shop Now button not found in the DOM');
+        debugLog('⚠️ Shop Now button not found in the DOM');
     }
     
     // 2. Add to Cart event tracking
     const addToCartButtons = document.querySelectorAll('.add-to-cart');
     if (addToCartButtons.length > 0) {
-        console.log(`Found ${addToCartButtons.length} Add to Cart buttons, attaching event listeners`);
+        debugLog(`Found ${addToCartButtons.length} Add to Cart buttons, attaching event listeners`);
         
         addToCartButtons.forEach(button => {
             button.addEventListener('click', (event) => {
-                console.log('Add to Cart button clicked!');
+                debugLog('Add to Cart button clicked!');
                 
                 try {
                     // Get the product data from the parent product card
                     const productCard = button.closest('.product-card');
                     if (!productCard) {
-                        console.error('Cannot find parent product card');
+                        debugLog('⚠️ Cannot find parent product card');
                         return;
                     }
                     
@@ -367,13 +413,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     const productName = productCard.dataset.productName;
                     const productPrice = productCard.dataset.productPrice;
                     
+                    debugLog(`Product: ${productName} (${productId}) - $${productPrice}`);
+                    
                     // Get UTM parameters from URL
                     const utmParams = getUTMParameters();
-                    console.log('UTM Parameters for Add to Cart:', utmParams);
+                    debugLog('UTM Parameters for Add to Cart: ' + JSON.stringify(utmParams));
                     
                     // Check if SalesforceInteractions is available
-                    if (!window.SalesforceInteractions) {
-                        console.error('SalesforceInteractions is not available');
+                    if (!checkSalesforceInteractions()) {
                         return;
                     }
                     
@@ -381,6 +428,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const timestamp = new Date().toISOString();
                     
                     // Send the "Add to Cart" event to Salesforce Interactions
+                    debugLog('Sending Add to Cart event to SalesforceInteractions');
                     window.SalesforceInteractions.sendEvent({
                         interaction: {
                             name: "Campaigns Events",
@@ -393,56 +441,90 @@ document.addEventListener('DOMContentLoaded', () => {
                             custom3: timestamp
                         }
                     }).then(res => {
-                        console.log('Add to Cart event sent successfully:', res);
-                        console.log(`Product added to cart: ${productName} (${productId}) - $${productPrice}`);
+                        debugLog('✅ Add to Cart event sent successfully');
                     }).catch(err => {
-                        console.error('Add to Cart event sending error:', err);
+                        debugLog('⚠️ Add to Cart event sending error: ' + (err.message || err));
                     });
                 } catch (error) {
-                    console.error('Error in Add to Cart event handling:', error);
+                    debugLog('⚠️ Error in Add to Cart event handling: ' + (error.message || error));
                 }
             });
         });
     } else {
-        console.log('No Add to Cart buttons found');
+        debugLog('⚠️ No Add to Cart buttons found');
     }
     
-    // 3. Newsletter signup event tracking
+    // 3. Newsletter signup event tracking - DEBUGGING FOCUSED
+    debugLog('Searching for newsletter form...');
     const newsletterForm = document.getElementById('newsletter-form');
+    
     if (newsletterForm) {
-        console.log('Newsletter form found, attaching submit event listener');
+        debugLog('✅ Newsletter form found! Form structure:');
+        debugLog(newsletterForm.outerHTML);
         
-        newsletterForm.addEventListener('submit', (event) => {
+        // Check if email input exists
+        const emailInput = newsletterForm.querySelector('input[type="email"]');
+        if (emailInput) {
+            debugLog('✅ Email input found in form');
+        } else {
+            debugLog('⚠️ Email input NOT found in newsletter form');
+        }
+        
+        // Check if submit button exists
+        const submitButton = newsletterForm.querySelector('button[type="submit"]');
+        if (submitButton) {
+            debugLog('✅ Submit button found in form');
+            
+            // Add direct click handler to submit button as backup
+            submitButton.addEventListener('click', function(event) {
+                debugLog('Newsletter submit button clicked directly!');
+                if (!checkSalesforceInteractions()) {
+                    debugLog('SalesforceInteractions not available during button click');
+                }
+            });
+        } else {
+            debugLog('⚠️ Submit button NOT found in newsletter form');
+        }
+        
+        // Main form submission handler
+        newsletterForm.addEventListener('submit', function(event) {
+            debugLog('🎉 NEWSLETTER FORM SUBMITTED!');
             event.preventDefault(); // Prevent the default form submission
-            console.log('Newsletter form submitted!');
             
             try {
                 // Get the email input value
                 const emailInput = newsletterForm.querySelector('input[type="email"]');
                 if (!emailInput) {
-                    console.error('Email input not found in the newsletter form');
+                    debugLog('⚠️ Email input not found in the newsletter form during submission');
                     return;
                 }
                 
                 const userEmail = emailInput.value;
+                debugLog(`Email value: "${userEmail}"`);
+                
                 if (!userEmail) {
-                    console.error('Email input is empty');
+                    debugLog('⚠️ Email input is empty');
                     return;
                 }
                 
                 // Get UTM parameters from URL
                 const utmParams = getUTMParameters();
-                console.log('UTM Parameters for Newsletter:', utmParams);
+                debugLog('UTM Parameters for Newsletter: ' + JSON.stringify(utmParams));
                 
                 // Check if SalesforceInteractions is available
-                if (!window.SalesforceInteractions) {
-                    console.error('SalesforceInteractions is not available for newsletter tracking');
+                if (!checkSalesforceInteractions()) {
+                    debugLog('⚠️ Cannot send newsletter event - SalesforceInteractions not available');
+                    // Show alert anyway for testing
+                    alert('Thank you for subscribing to our newsletter! (Note: Event tracking unavailable)');
                     return;
                 }
                 
-                // Send the "Newsletter Signup" event to Salesforce Interactions
                 // Create a timestamp for when this action took place
                 const timestamp = new Date().toISOString();
+                debugLog('Event timestamp: ' + timestamp);
+                
+                // Send the "Newsletter Signup" event to Salesforce Interactions
+                debugLog('Attempting to send Newsletter signup event...');
                 
                 window.SalesforceInteractions.sendEvent({
                     interaction: {
@@ -456,8 +538,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         custom3: timestamp
                     }
                 }).then(res => {
-                    console.log('Newsletter event sent successfully:', res);
-                    console.log(`Newsletter signup: ${userEmail}`);
+                    debugLog('✅ Newsletter event sent successfully!');
                     
                     // Clear the form
                     emailInput.value = '';
@@ -465,16 +546,75 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Show a confirmation message
                     alert('Thank you for subscribing to our newsletter!');
                 }).catch(err => {
-                    console.error('Newsletter event sending error:', err);
+                    debugLog('⚠️ Newsletter event sending error: ' + (err.message || err));
+                    // Show alert anyway
+                    alert('Thank you for subscribing to our newsletter! (Note: Event tracking error)');
                 });
             } catch (error) {
-                console.error('Error in Newsletter event handling:', error);
+                debugLog('⚠️ Error in Newsletter event handling: ' + (error.message || error));
+                // Show alert anyway
+                alert('Thank you for subscribing to our newsletter! (Note: Processing error)');
             }
         });
+        
+        // Test submission directly - uncomment if needed
+        // newsletterForm.dispatchEvent(new Event('submit'));
+        
+        debugLog('✅ Newsletter form submit handler attached successfully');
     } else {
-        console.error('Newsletter form not found in the DOM');
+        debugLog('⚠️ Newsletter form NOT found in the DOM - CRITICAL ERROR');
+        // Try alternative selector approaches
+        const possibleNewsletterForms = document.querySelectorAll('form');
+        debugLog(`Found ${possibleNewsletterForms.length} total forms on the page`);
+        
+        possibleNewsletterForms.forEach((form, index) => {
+            debugLog(`Form #${index+1}: ${form.id || 'No ID'} - Contains ${form.querySelectorAll('input[type="email"]').length} email inputs`);
+        });
     }
+    
+    handlersAttached = true;
+    debugLog('All event handlers attached successfully');
+}
+
+// Ensure handlers are attached after DOM is fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    debugLog('DOMContentLoaded event fired');
+    attachEventHandlers();
 });
+
+// Backup approach in case DOMContentLoaded already fired
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    debugLog('Document already loaded, attaching handlers immediately');
+    setTimeout(attachEventHandlers, 0);
+}
+
+// Expose a test function globally for debugging via console
+window.testNewsletterSubmit = function() {
+    debugLog('Manual newsletter submit test triggered');
+    const form = document.getElementById('newsletter-form');
+    if (form) {
+        debugLog('Triggering submit event on newsletter form');
+        form.dispatchEvent(new Event('submit'));
+    } else {
+        debugLog('Cannot find newsletter form for testing');
+    }
+};
+
+// Check SalesforceInteractions periodically 
+let checkCount = 0;
+const maxChecks = 5;
+const checkInterval = setInterval(function() {
+    checkCount++;
+    if (checkSalesforceInteractions()) {
+        debugLog(`SalesforceInteractions became available after ${checkCount} checks`);
+        clearInterval(checkInterval);
+    } else if (checkCount >= maxChecks) {
+        debugLog(`SalesforceInteractions still not available after ${maxChecks} checks`);
+        clearInterval(checkInterval);
+    }
+}, 1000);
+
+debugLog('Initialization complete');
 </script>
     
 </body>
