@@ -325,110 +325,154 @@
 
     }
 
-    // Add to Cart Event Tracking with UTM Parameter Extraction
-document.addEventListener('DOMContentLoaded', () => {
-    // Function to extract UTM parameters from URL
-    function getUTMParameters() {
-        const urlParams = new URLSearchParams(window.location.search);
-        return {
-            utm_source: urlParams.get('utm_source') || '',
-            utm_campaign: urlParams.get('utm_campaign') || '',
-            utm_content: urlParams.get('utm_content') || ''
-        };
-    }
+ // Define getUTMParameters globally, outside of any event listeners
+function getUTMParameters() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return {
+        utm_source: urlParams.get('utm_source') || '',
+        utm_campaign: urlParams.get('utm_campaign') || '',
+        utm_content: urlParams.get('utm_content') || ''
+    };
+}
 
-    // Get all "Add to Cart" buttons
-    const addToCartButtons = document.querySelectorAll('.add-to-cart');
+// Consolidated event handling in a single DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM fully loaded, initializing all event handlers');
     
-    // Add click event listener to each button
-    addToCartButtons.forEach(button => {
-        button.addEventListener('click', (event) => {
-            console.log('Add to Cart button clicked!');
-            
-            // Get the product data from the parent product card
-            const productCard = button.closest('.product-card');
-            const productId = productCard.dataset.productId;
-            const productName = productCard.dataset.productName;
-            const productPrice = productCard.dataset.productPrice;
-            
-            // Get UTM parameters from URL
-            const utmParams = getUTMParameters();
-            
-            // Send the "Add to Cart" event to Salesforce Interactions using the provided format
-            window.SalesforceInteractions.sendEvent({
-                interaction: {
-                    name: "Campaigns Events",
-                    eventType: "campaignsEvents",
-                    campaignName: utmParams.utm_campaign,
-                    campaignSource: utmParams.utm_source,
-                    campaignContent: utmParams.utm_content,
-                    custom1: "product_add_to_cart",
-                    custom2: productName,
-                    custom3: parseFloat(productPrice)
+    // 1. Shop Now button handler
+    const shopNowBtn = document.getElementById('shop-now-btn');
+    if (shopNowBtn) {
+        console.log('Shop Now button found, attaching event listener');
+        shopNowBtn.addEventListener('click', () => {
+            window.location.href = 'catalog.html';
+        });
+    } else {
+        console.log('Shop Now button not found in the DOM');
+    }
+    
+    // 2. Add to Cart event tracking
+    const addToCartButtons = document.querySelectorAll('.add-to-cart');
+    if (addToCartButtons.length > 0) {
+        console.log(`Found ${addToCartButtons.length} Add to Cart buttons, attaching event listeners`);
+        
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                console.log('Add to Cart button clicked!');
+                
+                try {
+                    // Get the product data from the parent product card
+                    const productCard = button.closest('.product-card');
+                    if (!productCard) {
+                        console.error('Cannot find parent product card');
+                        return;
+                    }
+                    
+                    const productId = productCard.dataset.productId;
+                    const productName = productCard.dataset.productName;
+                    const productPrice = productCard.dataset.productPrice;
+                    
+                    // Get UTM parameters from URL
+                    const utmParams = getUTMParameters();
+                    console.log('UTM Parameters for Add to Cart:', utmParams);
+                    
+                    // Check if SalesforceInteractions is available
+                    if (!window.SalesforceInteractions) {
+                        console.error('SalesforceInteractions is not available');
+                        return;
+                    }
+                    
+                    // Send the "Add to Cart" event to Salesforce Interactions
+                    window.SalesforceInteractions.sendEvent({
+                        interaction: {
+                            name: "Campaigns Events",
+                            eventType: "campaignsEvents",
+                            campaignName: utmParams.utm_campaign,
+                            campaignSource: utmParams.utm_source,
+                            campaignContent: utmParams.utm_content,
+                            custom1: "product_add_to_cart",
+                            custom2: productName,
+                            custom3: parseFloat(productPrice)
+                        }
+                    }).then(res => {
+                        console.log('Add to Cart event sent successfully:', res);
+                        console.log(`Product added to cart: ${productName} (${productId}) - $${productPrice}`);
+                    }).catch(err => {
+                        console.error('Add to Cart event sending error:', err);
+                    });
+                } catch (error) {
+                    console.error('Error in Add to Cart event handling:', error);
                 }
-            }).then(res => {
-                console.log('Event sent successfully:', res);
-                console.log(`Product added to cart: ${productName} (${productId}) - $${productPrice}`);
-                console.log('UTM Parameters:', utmParams);
-            }).catch(err => {
-                console.error('Event sending error:', err);
             });
         });
-    });
-});
-
-        // Newsletter Signup Event Tracking
-document.addEventListener('DOMContentLoaded', () => {
-    // Using the existing getUTMParameters function that's already defined
-
-    // Get the newsletter form
-    const newsletterForm = document.getElementById('newsletter-form');
+    } else {
+        console.log('No Add to Cart buttons found');
+    }
     
-    // Add submit event listener to the newsletter form
+    // 3. Newsletter signup event tracking
+    const newsletterForm = document.getElementById('newsletter-form');
     if (newsletterForm) {
+        console.log('Newsletter form found, attaching submit event listener');
+        
         newsletterForm.addEventListener('submit', (event) => {
             event.preventDefault(); // Prevent the default form submission
             console.log('Newsletter form submitted!');
             
-            // Get the email input value
-            const emailInput = newsletterForm.querySelector('input[type="email"]');
-            const userEmail = emailInput ? emailInput.value : '';
-            
-            // Get UTM parameters from URL
-            const utmParams = getUTMParameters();
-            
-            // Send the "Newsletter Signup" event to Salesforce Interactions
-            window.SalesforceInteractions.sendEvent({
-                interaction: {
-                    name: "Campaigns Events",
-                    eventType: "campaignsEvents",
-                    campaignName: utmParams.utm_campaign,
-                    campaignSource: utmParams.utm_source,
-                    campaignContent: utmParams.utm_content,
-                    custom1: "Newsletter Signup",
-                    custom2: "Homepage Newsletter",
-                    custom3: "Delivery via email"
+            try {
+                // Get the email input value
+                const emailInput = newsletterForm.querySelector('input[type="email"]');
+                if (!emailInput) {
+                    console.error('Email input not found in the newsletter form');
+                    return;
                 }
-            }).then(res => {
-                console.log('Event sent successfully:', res);
-                console.log(`Newsletter signup: ${userEmail}`);
-                console.log('UTM Parameters:', utmParams);
                 
-                // Clear the form
-                if (emailInput) {
+                const userEmail = emailInput.value;
+                if (!userEmail) {
+                    console.error('Email input is empty');
+                    return;
+                }
+                
+                // Get UTM parameters from URL
+                const utmParams = getUTMParameters();
+                console.log('UTM Parameters for Newsletter:', utmParams);
+                
+                // Check if SalesforceInteractions is available
+                if (!window.SalesforceInteractions) {
+                    console.error('SalesforceInteractions is not available for newsletter tracking');
+                    return;
+                }
+                
+                // Send the "Newsletter Signup" event to Salesforce Interactions
+                window.SalesforceInteractions.sendEvent({
+                    interaction: {
+                        name: "Campaigns Events",
+                        eventType: "campaignsEvents",
+                        campaignName: utmParams.utm_campaign,
+                        campaignSource: utmParams.utm_source,
+                        campaignContent: utmParams.utm_content,
+                        custom1: "Newsletter Signup",
+                        custom2: "Homepage Newsletter",
+                        custom3: "Delivery via email"
+                    }
+                }).then(res => {
+                    console.log('Newsletter event sent successfully:', res);
+                    console.log(`Newsletter signup: ${userEmail}`);
+                    
+                    // Clear the form
                     emailInput.value = '';
-                }
-                
-                // Show a confirmation message (you can customize this part)
-                alert('Thank you for subscribing to our newsletter!');
-                
-            }).catch(err => {
-                console.error('Event sending error:', err);
-            });
+                    
+                    // Show a confirmation message
+                    alert('Thank you for subscribing to our newsletter!');
+                }).catch(err => {
+                    console.error('Newsletter event sending error:', err);
+                });
+            } catch (error) {
+                console.error('Error in Newsletter event handling:', error);
+            }
         });
+    } else {
+        console.error('Newsletter form not found in the DOM');
     }
-});
-        
+});       
     </script>
     
 </body>
