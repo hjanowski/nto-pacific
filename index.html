@@ -325,43 +325,59 @@
 
     }
 
-        // Add to Cart Event Tracking
-    document.addEventListener('DOMContentLoaded', () => {
-        // Get all "Add to Cart" buttons
-        const addToCartButtons = document.querySelectorAll('.add-to-cart');
-        
-        // Add click event listener to each button
-        addToCartButtons.forEach(button => {
-            button.addEventListener('click', (event) => {
-                 console.log('Add to Cart button clicked!');
-                // Get the product data from the parent product card
-                const productCard = button.closest('.product-card');
-                const productId = productCard.dataset.productId;
-                const productName = productCard.dataset.productName;
-                const productPrice = productCard.dataset.productPrice;
-                
-                // Get current timestamp in UTC
-                const currentTime = new Date('2025-04-22T21:37:55Z');
-                
-                // Send the "Add to Cart" event to Salesforce Interactions
-                SalesforceInteractions.sendEvent({
-                    event: {
-                        name: "Add to Cart",
-                        eventType: "campaignsEvents",
-                        campaignName: "US_Midwest_Summer Vacation Season Offer_F24-45",
-                        campaignSource: " Meta Ads",
-                        campaignContent: "FB Banner",
-                        custom1: "product_add_to_cart",
-                        custom2: productName,
-                        custom3: parseFloat(productPrice),
-                        timestamp: currentTime.toISOString()
-                    }
-                });
-                
+    // Add to Cart Event Tracking with UTM Parameter Extraction
+document.addEventListener('DOMContentLoaded', () => {
+    // Function to extract UTM parameters from URL
+    function getUTMParameters() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return {
+            utm_source: urlParams.get('utm_source') || '',
+            utm_medium: urlParams.get('utm_medium') || '',
+            utm_campaign: urlParams.get('utm_campaign') || '',
+            utm_content: urlParams.get('utm_content') || '',
+            utm_term: urlParams.get('utm_term') || ''
+        };
+    }
+
+    // Get all "Add to Cart" buttons
+    const addToCartButtons = document.querySelectorAll('.add-to-cart');
+    
+    // Add click event listener to each button
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', (event) => {
+            console.log('Add to Cart button clicked!');
+            
+            // Get the product data from the parent product card
+            const productCard = button.closest('.product-card');
+            const productId = productCard.dataset.productId;
+            const productName = productCard.dataset.productName;
+            const productPrice = productCard.dataset.productPrice;
+            
+            // Get UTM parameters from URL
+            const utmParams = getUTMParameters();
+            
+            // Send the "Add to Cart" event to Salesforce Interactions using the provided format
+            window.SalesforceInteractions.sendEvent({
+                interaction: {
+                    name: "Campaigns Events",
+                    eventType: "campaignsEvents",
+                    campaignName: utmParams.utm_campaign || "EMEA_GS_NonBrand_AppExchange_Mod",
+                    campaignSource: utmParams.utm_source || "Meta Ads",
+                    campaignContent: utmParams.utm_content || "Free webinar! Join!",
+                    custom1: "product_add_to_cart",
+                    custom2: productName,
+                    custom3: parseFloat(productPrice)
+                }
+            }).then(res => {
+                console.log('Event sent successfully:', res);
                 console.log(`Product added to cart: ${productName} (${productId}) - $${productPrice}`);
+                console.log('UTM Parameters:', utmParams);
+            }).catch(err => {
+                console.error('Event sending error:', err);
             });
         });
     });
+});
         
     </script>
     
