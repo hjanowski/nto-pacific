@@ -3,68 +3,320 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NTO Pacific - Minimal Test</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
-        .product {
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-        button {
-            padding: 5px 10px;
-            background-color: #0066cc;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        form {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ddd;
-        }
-    </style>
+    <title>NTO Pacific | Premium Diving Equipment</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
 </head>
 <body>
-    <h1>NTO Pacific - Minimal Test</h1>
-    
-    <div class="product-list">
-        <div class="product" data-product-name="Test Product 1">
-            <h3>Test Product 1</h3>
-            <p>$99.99</p>
-            <button class="add-to-cart">Add to Cart</button>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>NTO Pacific</h1>
+                <p>Premium Diving Equipment</p>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#" class="active">Home</a></li>
+                    <li><a href="catalog.html">Shop</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="user-actions">
+                <button id="cart-btn" class="btn-icon"><span class="cart-count">0</span>🛒</button>
+                <button id="login-btn" class="btn-primary">Login</button>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2>Explore the Depths</h2>
+                <p>Professional diving equipment for every adventure</p>
+                <button class="btn-primary btn-large" id="shop-now-btn">Shop Now</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="featured-products">
+        <div class="container">
+            <h2 class="section-title">Featured Equipment</h2>
+            <div class="products-grid">
+                <div class="product-card" data-product-id="1" data-product-name="Elite Pro Diving Mask" data-product-price="129.99" data-in-stock="true">
+                    <div class="product-image"></div>
+                    <h3>Elite Pro Diving Mask</h3>
+                    <p class="product-price">$129.99</p>
+                    <button class="btn-secondary add-to-cart">Add to Cart</button>
+                </div>
+                <div class="product-card" data-product-id="2" data-product-name="Aqua Lung Regulator" data-product-price="349.99" data-in-stock="true">
+                    <div class="product-image"></div>
+                    <h3>Aqua Lung Regulator</h3>
+                    <p class="product-price">$349.99</p>
+                    <button class="btn-secondary add-to-cart">Add to Cart</button>
+                </div>
+                <div class="product-card" data-product-id="3" data-product-name="Pacific Fins - Limited Edition" data-product-price="189.99" data-in-stock="false">
+                    <div class="product-image"></div>
+                    <h3>Pacific Fins - Limited Edition</h3>
+                    <p class="product-price">$189.99</p>
+                    <p class="out-of-stock">Out of Stock</p>
+                    <button class="btn-secondary notify-me">Notify Me</button>
+                </div>
+                <div class="product-card" data-product-id="4" data-product-name="Dive Computer Pro X" data-product-price="599.99" data-in-stock="true">
+                    <div class="product-image"></div>
+                    <h3>Dive Computer Pro X</h3>
+                    <p class="product-price">$599.99</p>
+                    <button class="btn-secondary add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="collection-banner">
+        <div class="container">
+            <div class="banner-content">
+                <h2>New 2025 Collection</h2>
+                <p>Engineered for the deepest dives</p>
+                <button class="btn-primary">Explore Collection</button>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-columns">
+                <div class="footer-column">
+                    <h3>NTO Pacific</h3>
+                    <p>Premium diving equipment for professional and recreational divers since 2010.</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Shop</a></li>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Customer Service</h3>
+                    <ul>
+                        <li><a href="#">Shipping</a></li>
+                        <li><a href="#">Returns</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Newsletter</h3>
+                    <p>Subscribe for updates on new products and promotions</p>
+                    <form id="newsletter-form">
+                        <input type="email" placeholder="Your email">
+                        <button type="submit" class="btn-primary">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>© 2025 NTO Pacific. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal Components -->
+    <div class="modal" id="login-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Login to NTO Pacific</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn-primary btn-full">Login</button>
+            </form>
+            <p class="form-footer">Don't have an account? <a href="#" id="show-signup">Sign up</a></p>
         </div>
     </div>
+
+    <div class="modal" id="signup-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Create Account</h2>
+            <form id="signup-form">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-email">Email</label>
+                    <input type="email" id="signup-email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirm-password">Confirm Password</label>
+                    <input type="password" id="confirm-password" name="confirm-password" required>
+                </div>
+                <button type="submit" class="btn-primary btn-full">Create Account</button>
+            </form>
+            <p class="form-footer">Already have an account? <a href="#" id="show-login">Login</a></p>
+        </div>
+    </div>
+
+    <div class="modal" id="cart-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Your Cart</h2>
+            <div id="cart-items">
+                <!-- Cart items will be added here dynamically -->
+            </div>
+            <div class="cart-summary">
+                <p>Subtotal: <span id="cart-subtotal">$0.00</span></p>
+                <p>Shipping: <span id="cart-shipping">$0.00</span></p>
+                <p>Total: <span id="cart-total">$0.00</span></p>
+            </div>
+            <button id="checkout-btn" class="btn-primary btn-full">Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <div class="modal" id="checkout-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Checkout</h2>
+            <form id="checkout-form">
+                <div class="form-section">
+                    <h3>Shipping Information</h3>
+                    <div class="form-group">
+                        <label for="shipping-name">Full Name</label>
+                        <input type="text" id="shipping-name" name="shipping-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="shipping-address">Address</label>
+                        <input type="text" id="shipping-address" name="shipping-address" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="shipping-city">City</label>
+                            <input type="text" id="shipping-city" name="shipping-city" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="shipping-zip">ZIP Code</label>
+                            <input type="text" id="shipping-zip" name="shipping-zip" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="shipping-country">Country</label>
+                        <select id="shipping-country" name="shipping-country" required>
+                            <option value="">Select Country</option>
+                            <option value="US">United States</option>
+                            <option value="CA">Canada</option>
+                            <option value="AU">Australia</option>
+                            <option value="UK">United Kingdom</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-section">
+                    <h3>Payment Information</h3>
+                    <div class="form-group">
+                        <label for="card-number">Card Number</label>
+                        <input type="text" id="card-number" name="card-number" placeholder="XXXX XXXX XXXX XXXX" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expiry-date">Expiry Date</label>
+                            <input type="text" id="expiry-date" name="expiry-date" placeholder="MM/YY" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cvv">CVV</label>
+                            <input type="text" id="cvv" name="cvv" placeholder="XXX" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="order-summary">
+                    <h3>Order Summary</h3>
+                    <p>Total: <span id="order-total">$0.00</span></p>
+                </div>
+                <button type="submit" class="btn-primary btn-full">Complete Purchase</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="notify-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Notify Me When Available</h2>
+            <p id="notify-product-name">Pacific Fins - Limited Edition</p>
+            <form id="notify-form">
+                <div class="form-group">
+                    <label for="notify-email">Email</label>
+                    <input type="email" id="notify-email" name="notify-email" required>
+                </div>
+                <button type="submit" class="btn-primary btn-full">Notify Me</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="confirmation-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="confirmation-message">
+                <h2>Thank You!</h2>
+                <p id="confirmation-text"></p>
+                <button class="btn-primary btn-full close-confirmation">Continue Shopping</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay"></div>
     
-    <form id="newsletter-form">
-        <h3>Newsletter Signup</h3>
-        <input type="email" placeholder="Your email address">
-        <button type="submit">Subscribe</button>
-    </form>
-    
-    <div id="debug-log" style="margin-top: 20px; padding: 10px; background-color: #f0f0f0; height: 200px; overflow-y: auto;">
-        <h3>Debug Log</h3>
+    <!-- Hidden debug log that you can show via console if needed -->
+    <div id="debug-log" style="display: none; position: fixed; bottom: 0; right: 0; width: 400px; height: 200px; background-color: rgba(0,0,0,0.8); color: white; padding: 10px; overflow-y: auto; z-index: 9999;">
         <div id="log-content"></div>
     </div>
-    
+
+    <script>
+    // Connect the "Shop Now" button to the catalog page
+    document.addEventListener('DOMContentLoaded', () => {
+        const shopNowBtn = document.getElementById('shop-now-btn');
+        if (shopNowBtn) {
+            shopNowBtn.addEventListener('click', () => {
+                window.location.href = 'catalog.html';
+            });
+        }
+    });
+    </script>
+
     <!-- Load the Salesforce script -->
     <script src="https://cdn.c360a.salesforce.com/beacon/c360a/233a8f36-3f93-4e01-84e5-c210837a6c97/scripts/c360a.min.js"></script>
     
+    <!-- Salesforce Events - KEEP EXACTLY AS IS FROM THE WORKING TEST -->
     <script>
     // Visual debug logging
     function debugLog(message) {
         console.log('[NTO DEBUG] ' + message);
         
-        // Also log to the page
+        // Also log to the page (hidden by default, can be shown via console)
         const logContent = document.getElementById('log-content');
         if (logContent) {
             const logEntry = document.createElement('div');
             logEntry.textContent = new Date().toLocaleTimeString() + ': ' + message;
             logContent.appendChild(logEntry);
         }
+    }
+    
+    // Define getUTMParameters for tracking
+    function getUTMParameters() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return {
+            utm_source: urlParams.get('utm_source') || '',
+            utm_campaign: urlParams.get('utm_campaign') || '',
+            utm_content: urlParams.get('utm_content') || ''
+        };
     }
     
     debugLog('Script started');
@@ -121,15 +373,17 @@
     
     // Send an Add to Cart event
     function sendAddToCartEvent(productName) {
+        const utmParams = getUTMParameters();
         debugLog(`Sending Add to Cart event for: ${productName}`);
+        debugLog('UTM params: ' + JSON.stringify(utmParams));
         
         return window.SalesforceInteractions.sendEvent({ 
             interaction: { 
                 name: "Campaigns Events", 
                 eventType: "campaignsEvents", 
-                campaignName: "Test Campaign", 
-                campaignSource: "Test Source", 
-                campaignContent: "Test Content", 
+                campaignName: utmParams.utm_campaign, 
+                campaignSource: utmParams.utm_source, 
+                campaignContent: utmParams.utm_content, 
                 custom1: "product_add_to_cart", 
                 custom2: productName, 
                 custom3: new Date().toISOString() 
@@ -145,17 +399,19 @@
     
     // Send Newsletter event
     function sendNewsletterEvent(email) {
+        const utmParams = getUTMParameters();
         debugLog(`Sending Newsletter event for: ${email}`);
+        debugLog('UTM params: ' + JSON.stringify(utmParams));
         
         return window.SalesforceInteractions.sendEvent({ 
             interaction: { 
                 name: "Campaigns Events", 
                 eventType: "campaignsEvents", 
-                campaignName: "Test Campaign", 
-                campaignSource: "Test Source", 
-                campaignContent: "Test Content", 
+                campaignName: utmParams.utm_campaign, 
+                campaignSource: utmParams.utm_source, 
+                campaignContent: utmParams.utm_content, 
                 custom1: "Newsletter Signup", 
-                custom2: "Test Newsletter", 
+                custom2: "Homepage Newsletter", 
                 custom3: new Date().toISOString() 
             } 
         }).then(res => { 
@@ -167,16 +423,56 @@
         });
     }
     
+    // Send identity if user is logged in
+    function sendIdentityIfLoggedIn() {
+        const currentUser = localStorage.getItem('ntoCurrentUser');
+        if (!currentUser) {
+            debugLog('No logged in user found, skipping identity event');
+            return Promise.resolve();
+        }
+        
+        try {
+            const parsedUser = JSON.parse(currentUser);
+            const firstName = parsedUser.name.split(' ')[0];
+            const lastName = parsedUser.name.split(' ')[1] || '';
+            const email = parsedUser.email;
+            
+            debugLog(`Sending identity event for user: ${firstName} ${lastName}`);
+            
+            return window.SalesforceInteractions.sendEvent({ 
+                user: { 
+                    attributes: { 
+                        eventType: 'identity', 
+                        firstName: firstName, 
+                        lastName: lastName, 
+                        email: email, 
+                        isAnonymous: 0 
+                    } 
+                } 
+            }).then(() => {
+                debugLog('Identity event sent successfully');
+            }).catch(err => {
+                debugLog('Identity event error: ' + JSON.stringify(err));
+                throw err;
+            });
+        } catch (error) {
+            debugLog('Error processing user data: ' + error.message);
+            return Promise.reject(error);
+        }
+    }
+    
     // Set up event handlers
     function setupEventHandlers() {
         debugLog('Setting up event handlers');
         
         // Add to Cart buttons
-        document.querySelectorAll('.add-to-cart').forEach(button => {
+        document.querySelectorAll('.add-to-cart').forEach((button, index) => {
+            debugLog(`Setting up handler for Add to Cart button #${index + 1}`);
+            
             button.addEventListener('click', function() {
-                const product = this.closest('.product');
-                if (product) {
-                    const productName = product.dataset.productName;
+                const productCard = this.closest('.product-card');
+                if (productCard) {
+                    const productName = productCard.dataset.productName;
                     debugLog(`Add to Cart clicked for: ${productName}`);
                     
                     waitForSalesforceAPI()
@@ -195,6 +491,8 @@
         // Newsletter form
         const newsletterForm = document.getElementById('newsletter-form');
         if (newsletterForm) {
+            debugLog('Setting up handler for Newsletter form');
+            
             newsletterForm.addEventListener('submit', function(event) {
                 event.preventDefault();
                 
@@ -218,6 +516,8 @@
                         });
                 }
             });
+        } else {
+            debugLog('WARNING: Newsletter form not found!');
         }
     }
     
@@ -233,6 +533,10 @@
                 return initializeConsent();
             })
             .then(() => {
+                debugLog('Initialization complete, checking for logged in user');
+                return sendIdentityIfLoggedIn();
+            })
+            .then(() => {
                 debugLog('Initialization complete');
             })
             .catch(err => {
@@ -240,16 +544,47 @@
             });
     });
     
-    // Expose testing functions
-    window.testSF = {
-        addToCart: function() {
-            document.querySelector('.add-to-cart').click();
+    // Expose debugging functions to the console
+    window.debugSF = {
+        showDebugLog: function() {
+            const debugLog = document.getElementById('debug-log');
+            if (debugLog) {
+                debugLog.style.display = 'block';
+                return 'Debug log is now visible';
+            }
+            return 'Debug log element not found';
         },
-        newsletter: function(email = 'test@example.com') {
+        hideDebugLog: function() {
+            const debugLog = document.getElementById('debug-log');
+            if (debugLog) {
+                debugLog.style.display = 'none';
+                return 'Debug log is now hidden';
+            }
+            return 'Debug log element not found';
+        },
+        checkAPI: function() {
+            return typeof window.SalesforceInteractions !== 'undefined';
+        },
+        testAddToCart: function(index = 0) {
+            const buttons = document.querySelectorAll('.add-to-cart');
+            if (buttons.length > 0) {
+                const buttonIndex = index < buttons.length ? index : 0;
+                buttons[buttonIndex].click();
+                return true;
+            }
+            return false;
+        },
+        testNewsletter: function(email = 'test@example.com') {
             const form = document.getElementById('newsletter-form');
-            const input = form.querySelector('input[type="email"]');
-            input.value = email;
-            form.dispatchEvent(new Event('submit'));
+            if (form) {
+                const emailInput = form.querySelector('input[type="email"]');
+                if (emailInput) {
+                    emailInput.value = email;
+                    form.dispatchEvent(new Event('submit'));
+                    return true;
+                }
+            }
+            return false;
         }
     };
     </script>
