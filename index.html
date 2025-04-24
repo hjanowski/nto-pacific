@@ -311,18 +311,15 @@ function getUTMParameters() {
 function checkSalesforceInteractions() {
     if (typeof window.SalesforceInteractions === 'undefined') {
         debugLog('⚠️ SalesforceInteractions is NOT available');
-        sfInteractionsReady = false;
         return false;
     }
     
     if (typeof window.SalesforceInteractions.sendEvent !== 'function') {
         debugLog('⚠️ SalesforceInteractions.sendEvent is NOT a function');
-        sfInteractionsReady = false;
         return false;
     }
     
     debugLog('✅ SalesforceInteractions is available and ready');
-    sfInteractionsReady = true;
     return true;
 }
 
@@ -331,7 +328,7 @@ const eventQueue = [];
 
 // Function to process queued events
 function processEventQueue() {
-    if (!sfInteractionsReady) {
+    if (!checkSalesforceInteractions()) {
         debugLog('Cannot process event queue - SalesforceInteractions not ready');
         return;
     }
@@ -343,104 +340,71 @@ function processEventQueue() {
         debugLog(`Sending queued event: ${eventData.type}`);
         
         window.SalesforceInteractions.sendEvent(eventData.payload)
-            .then(() => {
-                debugLog(`✅ Queued ${eventData.type} event sent successfully`);
+            .then(res => {
+                debugLog(`✅ Queued ${eventData.type} event sent successfully:`, res);
             })
             .catch(err => {
-                debugLog(`⚠️ Error sending queued ${eventData.type} event: ${err.message || err}`);
+                debugLog(`⚠️ Error sending queued ${eventData.type} event:`, err);
             });
     }
 }
 
-// Function to queue or send an event
-function queueOrSendEvent(eventType, payload) {
-    if (!checkSalesforceInteractions()) {
-        debugLog(`Queueing ${eventType} event for later`);
-        eventQueue.push({
-            type: eventType,
-            payload: payload
-        });
-        return Promise.resolve({ status: 'queued' });
-    }
-    
-    debugLog(`Sending ${eventType} event immediately`);
-    return window.SalesforceInteractions.sendEvent(payload)
-        .then(res => {
-            debugLog(`✅ ${eventType} event sent successfully`);
-            return res;
-        })
-        .catch(err => {
-            debugLog(`⚠️ Error sending ${eventType} event: ${err.message || err}`);
-            throw err;
-        });
-}
-
-// Keep track of handler attachment to prevent duplicates
-let handlersAttached = false;
-
 // Initialize SalesforceInteractions with user identity if logged in
-function initializeSalesforceInteractions() {
-    debugLog('Initializing SalesforceInteractions');
+function initializeConsent() {
+    debugLog('Initializing SalesforceInteractions consent');
     
-    // First ensure the API is available
-    if (!checkSalesforceInteractions()) {
-        debugLog('SalesforceInteractions not available yet, will try again later');
-        return false;
-    }
-    
-    // Initialize with consent - using the exact format from your example
+    // Initialize with consent - EXACTLY as provided in your example
     window.SalesforceInteractions.init({ 
         consents: [{ 
             provider: "CampaignAttribution", 
             purpose: "Tracking", 
             status: "Opt In" 
         }] 
-    }).then(res => {
-        debugLog("✅ SalesforceInteractions initialization successful");
+    }).then(res => { 
+        debugLog('Initialization success:', res); 
         sfInteractionsReady = true;
         
-        // Check if user is already logged in
-        const currentUser = localStorage.getItem('ntoCurrentUser');
-        if (currentUser) {
-            debugLog('User is logged in, sending identity event');
-            try {
-                const parseduser = JSON.parse(currentUser);
-                const Firstname = parseduser.name.split(" ")[0];
-                const Lastname = parseduser.name.split(" ")[1];
-                const Email = parseduser.email;
-                
-                // Send identity event using the exact format from your example
-                window.SalesforceInteractions.sendEvent({ 
-                    user: { 
-                        attributes: { 
-                            eventType: 'identity', 
-                            firstName: Firstname, 
-                            lastName: Lastname, 
-                            email: Email, 
-                            isAnonymous: 0 
-                        } 
-                    } 
-                }).then(() => {
-                    debugLog("✅ Identity event sent successfully");
-                    // Process any queued events after identity is established
-                    processEventQueue();
-                }).catch(err => {
-                    debugLog(`⚠️ Identity event error: ${err.message || err}`);
-                });
-            } catch (error) {
-                debugLog(`⚠️ Error processing user data: ${error.message || error}`);
-            }
-        } else {
-            debugLog('User is not logged in, will track anonymously');
-            // Process any queued events
-            processEventQueue();
-        }
-    }).catch(err => {
-        debugLog(`⚠️ SalesforceInteractions initialization error: ${err.message || err}`);
-        return false;
+        // Send identity if user is logged in
+        sendIdentityIfLoggedIn();
+        
+        // Process any queued events
+        processEventQueue();
+    }).catch(err => { 
+        debugLog('Initialization error:', err); 
     });
-    
-    return true;
+}
+
+// Function to send identity event if user is logged in
+function sendIdentityIfLoggedIn() {
+    const currentUser = localStorage.getItem('ntoCurrentUser');
+    if (currentUser) {
+        debugLog('User is logged in, sending identity event');
+        try {
+            const parseduser = JSON.parse(currentUser);
+            const Firstname = parseduser.name.split(" ")[0];
+            const Lastname = parseduser.name.split(" ")[1];
+            const Email = parseduser.email;
+            
+            // Send identity event EXACTLY as provided in your example
+            window.SalesforceInteractions.sendEvent({ 
+                user: { 
+                    attributes: { 
+                        eventType: 'identity', 
+                        firstName: Firstname, 
+                        lastName: Lastname, 
+                        email: Email, 
+                        isAnonymous: 0 
+                    } 
+                } 
+            });
+            
+            debugLog('Identity event sent for: ' + Firstname + ' ' + Lastname);
+        } catch (error) {
+            debugLog(`⚠️ Error processing user data:`, error);
+        }
+    } else {
+        debugLog('User is not logged in, skipping identity event');
+    }
 }
 
 // Function to handle Add to Cart event
@@ -468,31 +432,46 @@ function handleAddToCart(button) {
         // Create a timestamp for when this action took place
         const timestamp = new Date().toISOString();
         
-        // Prepare the event payload - using the exact format from your example
-        const addToCartPayload = {
-            interaction: {
-                name: "Campaigns Events",
-                eventType: "campaignsEvents",
-                campaignName: utmParams.utm_campaign || "",
-                campaignSource: utmParams.utm_source || "",
-                campaignContent: utmParams.utm_content || "",
-                custom1: "product_add_to_cart",
-                custom2: productName,
-                custom3: timestamp
-            }
-        };
-        
-        // Queue or send the event
-        queueOrSendEvent('Add to Cart', addToCartPayload)
-            .then(() => {
-                // Provide user feedback if needed
-                debugLog(`Product ${productName} added to cart tracking complete`);
-            })
-            .catch(() => {
-                debugLog('Add to Cart tracking failed, but user action should still proceed');
+        // If SalesforceInteractions is not available, queue the event
+        if (!checkSalesforceInteractions()) {
+            debugLog('SalesforceInteractions not available, queueing Add to Cart event');
+            eventQueue.push({
+                type: 'Add to Cart',
+                payload: {
+                    interaction: {
+                        name: "Campaigns Events",
+                        eventType: "campaignsEvents",
+                        campaignName: utmParams.utm_campaign,
+                        campaignSource: utmParams.utm_source,
+                        campaignContent: utmParams.utm_content,
+                        custom1: "product_add_to_cart",
+                        custom2: productName,
+                        custom3: timestamp
+                    }
+                }
             });
+            return;
+        }
+        
+        // Send event EXACTLY as provided in your example
+        window.SalesforceInteractions.sendEvent({ 
+            interaction: { 
+                name: "Campaigns Events", 
+                eventType: "campaignsEvents", 
+                campaignName: utmParams.utm_campaign, 
+                campaignSource: utmParams.utm_source, 
+                campaignContent: utmParams.utm_content, 
+                custom1: "product_add_to_cart", 
+                custom2: productName, 
+                custom3: timestamp
+            } 
+        }).then(res => { 
+            debugLog('Add to Cart event sent successfully:', res); 
+        }).catch(err => { 
+            debugLog('Add to Cart event sending error:', err); 
+        });
     } catch (error) {
-        debugLog(`⚠️ Error in Add to Cart event handling: ${error.message || error}`);
+        debugLog(`⚠️ Error in Add to Cart event handling:`, error);
     }
 }
 
@@ -504,7 +483,7 @@ function handleNewsletterSignup(form) {
         // Get the email input value
         const emailInput = form.querySelector('input[type="email"]');
         if (!emailInput) {
-            debugLog('⚠️ Email input not found in the newsletter form during submission');
+            debugLog('⚠️ Email input not found in the newsletter form');
             return;
         }
         
@@ -522,77 +501,78 @@ function handleNewsletterSignup(form) {
         
         // Create a timestamp for when this action took place
         const timestamp = new Date().toISOString();
-        debugLog('Event timestamp: ' + timestamp);
         
-        // Prepare the event payload - using the exact format from your example
-        const newsletterPayload = {
-            interaction: {
-                name: "Campaigns Events",
-                eventType: "campaignsEvents",
-                campaignName: utmParams.utm_campaign || "",
-                campaignSource: utmParams.utm_source || "",
-                campaignContent: utmParams.utm_content || "",
-                custom1: "Newsletter Signup",
-                custom2: "Homepage Newsletter",
-                custom3: timestamp
-            }
-        };
-        
-        // Queue or send the event
-        queueOrSendEvent('Newsletter Signup', newsletterPayload)
-            .then(() => {
-                // Clear the form
-                emailInput.value = '';
-                
-                // Show a confirmation message
-                alert('Thank you for subscribing to our newsletter!');
-            })
-            .catch(() => {
-                // Show alert anyway
-                alert('Thank you for subscribing to our newsletter! (Note: Event tracking error)');
+        // If SalesforceInteractions is not available, queue the event
+        if (!checkSalesforceInteractions()) {
+            debugLog('SalesforceInteractions not available, queueing Newsletter event');
+            eventQueue.push({
+                type: 'Newsletter Signup',
+                payload: {
+                    interaction: {
+                        name: "Campaigns Events",
+                        eventType: "campaignsEvents",
+                        campaignName: utmParams.utm_campaign,
+                        campaignSource: utmParams.utm_source,
+                        campaignContent: utmParams.utm_content,
+                        custom1: "Newsletter Signup",
+                        custom2: "Homepage Newsletter",
+                        custom3: timestamp
+                    }
+                }
             });
+            
+            // Still clear the form and show confirmation
+            emailInput.value = '';
+            alert('Thank you for subscribing to our newsletter!');
+            
+            return;
+        }
+        
+        // Send event EXACTLY as provided in your example
+        window.SalesforceInteractions.sendEvent({ 
+            interaction: { 
+                name: "Campaigns Events", 
+                eventType: "campaignsEvents", 
+                campaignName: utmParams.utm_campaign, 
+                campaignSource: utmParams.utm_source, 
+                campaignContent: utmParams.utm_content, 
+                custom1: "Newsletter Signup", 
+                custom2: "Homepage Newsletter", 
+                custom3: timestamp 
+            } 
+        }).then(res => { 
+            debugLog('Newsletter event sent successfully:', res); 
+            
+            // Clear the form
+            emailInput.value = '';
+            
+            // Show confirmation
+            alert('Thank you for subscribing to our newsletter!');
+        }).catch(err => { 
+            debugLog('Newsletter event sending error:', err); 
+            
+            // Still clear the form and show confirmation
+            emailInput.value = '';
+            alert('Thank you for subscribing to our newsletter!');
+        });
     } catch (error) {
-        debugLog(`⚠️ Error in Newsletter event handling: ${error.message || error}`);
-        // Show alert anyway
-        alert('Thank you for subscribing to our newsletter! (Note: Processing error)');
+        debugLog(`⚠️ Error in Newsletter event handling:`, error);
+        alert('Thank you for subscribing to our newsletter!');
     }
 }
 
 // Function to attach all event handlers
 function attachEventHandlers() {
-    if (handlersAttached) {
-        debugLog('Event handlers already attached, skipping');
-        return;
-    }
-
     debugLog('Attaching all event handlers');
     
-    // 1. Shop Now button handler
-    const shopNowBtn = document.getElementById('shop-now-btn');
-    if (shopNowBtn) {
-        debugLog('Shop Now button found, attaching event listener');
-        shopNowBtn.addEventListener('click', () => {
-            debugLog('Shop Now button clicked');
-            window.location.href = 'catalog.html';
-        });
-    } else {
-        debugLog('⚠️ Shop Now button not found in the DOM');
-    }
-    
-    // 2. Add to Cart event tracking
+    // 1. Add to Cart event tracking
     const addToCartButtons = document.querySelectorAll('.add-to-cart');
     if (addToCartButtons.length > 0) {
         debugLog(`Found ${addToCartButtons.length} Add to Cart buttons, attaching event listeners`);
         
         addToCartButtons.forEach((button, index) => {
             debugLog(`Attaching listener to Add to Cart button #${index+1}`);
-            
-            // First remove any existing listeners to prevent duplicates
-            const newButton = button.cloneNode(true);
-            button.parentNode.replaceChild(newButton, button);
-            
-            // Add the event listener
-            newButton.addEventListener('click', function(event) {
+            button.addEventListener('click', function() {
                 handleAddToCart(this);
             });
         });
@@ -600,187 +580,104 @@ function attachEventHandlers() {
         debugLog('⚠️ No Add to Cart buttons found');
     }
     
-    // 3. Newsletter signup event tracking
+    // 2. Newsletter signup event tracking
     debugLog('Searching for newsletter form...');
     const newsletterForm = document.getElementById('newsletter-form');
     
     if (newsletterForm) {
-        debugLog('✅ Newsletter form found! Form structure:');
+        debugLog('✅ Newsletter form found!');
         
-        // Check if email input exists
-        const emailInput = newsletterForm.querySelector('input[type="email"]');
-        if (emailInput) {
-            debugLog('✅ Email input found in form');
-        } else {
-            debugLog('⚠️ Email input NOT found in newsletter form');
-        }
-        
-        // Check if submit button exists
-        const submitButton = newsletterForm.querySelector('button[type="submit"]');
-        if (submitButton) {
-            debugLog('✅ Submit button found in form');
-            
-            // Add direct click handler to submit button as backup
-            submitButton.addEventListener('click', function(event) {
-                debugLog('Newsletter submit button clicked directly!');
-                // Let the form submit handler do the work
-            });
-        } else {
-            debugLog('⚠️ Submit button NOT found in newsletter form');
-        }
-        
-        // First remove any existing listeners to prevent duplicates
-        const newForm = newsletterForm.cloneNode(true);
-        newsletterForm.parentNode.replaceChild(newForm, newsletterForm);
-        
-        // Main form submission handler
-        newForm.addEventListener('submit', function(event) {
+        newsletterForm.addEventListener('submit', function(event) {
             event.preventDefault(); // Prevent the default form submission
             handleNewsletterSignup(this);
         });
         
         debugLog('✅ Newsletter form submit handler attached successfully');
     } else {
-        debugLog('⚠️ Newsletter form NOT found in the DOM - CRITICAL ERROR');
-        // Try alternative selector approaches
-        const possibleNewsletterForms = document.querySelectorAll('form');
-        debugLog(`Found ${possibleNewsletterForms.length} total forms on the page`);
-        
-        possibleNewsletterForms.forEach((form, index) => {
-            debugLog(`Form #${index+1}: ${form.id || 'No ID'} - Contains ${form.querySelectorAll('input[type="email"]').length} email inputs`);
-            
-            // If it has an email input, it might be the newsletter form
-            if (form.querySelectorAll('input[type="email"]').length > 0) {
-                debugLog('This form has an email input, attaching a listener just in case');
-                
-                // First remove any existing listeners
-                const newForm = form.cloneNode(true);
-                form.parentNode.replaceChild(newForm, form);
-                
-                newForm.addEventListener('submit', function(event) {
-                    debugLog('Potential newsletter form submitted');
-                    event.preventDefault();
-                    handleNewsletterSignup(this);
-                });
-            }
-        });
+        debugLog('⚠️ Newsletter form NOT found in the DOM');
     }
-    
-    handlersAttached = true;
-    debugLog('All event handlers attached successfully');
 }
 
 // Initialize on page load
-function initialize() {
-    debugLog('Initializing application');
-    
-    // First check if SalesforceInteractions is available
-    if (checkSalesforceInteractions()) {
-        // Initialize SalesforceInteractions (this will also process any queued events)
-        initializeSalesforceInteractions();
-    } else {
-        // If not immediately available, we'll try again via polling
-        debugLog('SalesforceInteractions not immediately available, will check periodically');
-    }
-    
-    // Attach event handlers (do this regardless of API availability)
-    attachEventHandlers();
-}
-
-// Ensure initialization after DOM is fully loaded
 document.addEventListener('DOMContentLoaded', function() {
     debugLog('DOMContentLoaded event fired');
-    initialize();
+    
+    // Attach event handlers
+    attachEventHandlers();
+    
+    // Check if SalesforceInteractions is already available
+    if (checkSalesforceInteractions()) {
+        debugLog('SalesforceInteractions available immediately');
+        initializeConsent();
+    } else {
+        debugLog('SalesforceInteractions not immediately available, will check periodically');
+    }
 });
 
-// Backup approach in case DOMContentLoaded already fired
-if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    debugLog('Document already loaded, initializing immediately');
-    setTimeout(initialize, 0);
-}
-
-// Expose test functions globally for debugging via console
+// Expose debugging functions
 window.testNewsletterSubmit = function() {
     debugLog('Manual newsletter submit test triggered');
     const form = document.getElementById('newsletter-form');
     if (form) {
-        debugLog('Manually triggering newsletter form submission');
         form.dispatchEvent(new Event('submit'));
     } else {
         debugLog('Cannot find newsletter form for testing');
-        
-        // Try to find any form with an email input
-        const forms = document.querySelectorAll('form');
-        for (let i = 0; i < forms.length; i++) {
-            if (forms[i].querySelector('input[type="email"]')) {
-                debugLog(`Testing submission of alternative form #${i+1}`);
-                forms[i].dispatchEvent(new Event('submit'));
-                break;
-            }
-        }
     }
 };
 
-window.testAddToCart = function(productIndex = 0) {
+window.testAddToCart = function(index = 0) {
     debugLog('Manual Add to Cart test triggered');
     const buttons = document.querySelectorAll('.add-to-cart');
     if (buttons.length > 0) {
-        const index = productIndex < buttons.length ? productIndex : 0;
-        debugLog(`Manually triggering Add to Cart for product #${index+1}`);
-        buttons[index].click();
+        const buttonIndex = index < buttons.length ? index : 0;
+        buttons[buttonIndex].click();
     } else {
         debugLog('Cannot find any Add to Cart buttons for testing');
     }
 };
 
-window.checkSFStatus = function() {
-    debugLog('Manual check of SalesforceInteractions status');
-    const isAvailable = checkSalesforceInteractions();
-    debugLog(`SalesforceInteractions available: ${isAvailable}`);
-    debugLog(`Queued events: ${eventQueue.length}`);
-    return isAvailable;
+window.manualInit = function() {
+    debugLog('Manual initialization requested');
+    if (checkSalesforceInteractions()) {
+        initializeConsent();
+    } else {
+        debugLog('Cannot initialize - SalesforceInteractions still not available');
+    }
 };
 
-window.processQueue = function() {
-    debugLog('Manual processing of event queue');
+window.processQueueManually = function() {
+    debugLog('Manual queue processing requested');
     processEventQueue();
 };
 
-window.manualInitialize = function() {
-    debugLog('Manual initialization triggered');
-    initializeSalesforceInteractions();
-};
-
-// Check SalesforceInteractions periodically 
+// Check SalesforceInteractions periodically
 let checkCount = 0;
-const maxChecks = 20; // Increased number of checks
+const maxChecks = 30;
 const checkInterval = setInterval(function() {
     checkCount++;
-    debugLog(`SalesforceInteractions availability check #${checkCount}`);
     
     if (checkSalesforceInteractions()) {
-        debugLog(`✅ SalesforceInteractions became available after ${checkCount} checks`);
+        debugLog(`SalesforceInteractions available after ${checkCount} checks`);
         
-        // If it's not already initialized, initialize it now
+        // Initialize if not already initialized
         if (!sfInteractionsReady) {
-            initializeSalesforceInteractions();
+            initializeConsent();
         }
         
-        // If we've found it and initialized successfully, stop checking
+        // If we've successfully initialized, stop checking
         if (sfInteractionsReady) {
             clearInterval(checkInterval);
-            debugLog('Cleared check interval after successful initialization');
         }
-    } 
+    }
     
     // Stop checking after max attempts
     if (checkCount >= maxChecks) {
-        debugLog(`⚠️ SalesforceInteractions still not available after ${maxChecks} checks`);
+        debugLog(`SalesforceInteractions still not available after ${maxChecks} checks`);
         clearInterval(checkInterval);
     }
 }, 1000);
 
-debugLog('Initialization complete');
+debugLog('Initialization setup complete');
 </script>
     
 </body>
