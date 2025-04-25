@@ -6,9 +6,6 @@
     <title>NTO Pacific | Premium Diving Equipment</title>
     <link rel="stylesheet" href="styles.css">
     <script src="script.js" defer></script>
-    
-    <!-- Load the Salesforce script first -->
-    <script src="https://cdn.c360a.salesforce.com/beacon/c360a/233a8f36-3f93-4e01-84e5-c210837a6c97/scripts/c360a.min.js"></script>
 </head>
 <body>
     <header>
@@ -288,22 +285,52 @@
         }
     });
     </script>
+
+    <!-- Load the Salesforce script -->
+    <script src="https://cdn.c360a.salesforce.com/beacon/c360a/233a8f36-3f93-4e01-84e5-c210837a6c97/scripts/c360a.min.js"></script>
     
-    <!-- Direct application of the working examples with minimal wrapping -->
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log("Page loaded, setting up Salesforce events");
+        // Variables to track state
+        let apiAvailable = false;
+        let consentInitialized = false;
+        let identitySent = false;
         
-        // Function to initialize Salesforce with consent
-        function initializeSalesforce() {
-            console.log("Attempting to initialize Salesforce");
-            
+        // Logging function
+        function log(message) {
+            const now = new Date();
+            const timestamp = now.toLocaleTimeString() + '.' + now.getMilliseconds().toString().padStart(3, '0');
+            console.log(`[${timestamp}] ${message}`);
+        }
+        
+        // Check if SalesforceInteractions is available
+        function checkApi() {
             if (typeof window.SalesforceInteractions === 'undefined') {
-                console.log("SalesforceInteractions not available");
+                log('SalesforceInteractions is NOT defined in window object');
+                apiAvailable = false;
                 return false;
             }
             
-            // Exactly as in your example
+            if (typeof window.SalesforceInteractions.sendEvent !== 'function') {
+                log('SalesforceInteractions.sendEvent is NOT a function');
+                apiAvailable = false;
+                return false;
+            }
+            
+            log('✅ SalesforceInteractions API is available!');
+            apiAvailable = true;
+            return true;
+        }
+        
+        // Initialize consent exactly as in your example
+        function initializeConsent() {
+            if (!apiAvailable) {
+                log('Cannot initialize - API not available');
+                return;
+            }
+            
+            log('Initializing consent...');
+            
+            // EXACTLY as provided in your example
             window.SalesforceInteractions.init({ 
                 consents: [{ 
                     provider: "CampaignAttribution", 
@@ -311,160 +338,223 @@
                     status: "Opt In" 
                 }] 
             }).then(res => { 
-                console.log('Initialization success:', res); 
-                return true;
+                log('✅ Initialization success: ' + JSON.stringify(res)); 
+                consentInitialized = true;
+                
+                // Send identity event immediately after initialization
+                sendIdentity();
             }).catch(err => { 
-                console.error('Initialization error:', err); 
-                return false;
-            });
-            
-            return true;
-        }
-        
-        // Add to Cart buttons
-        document.querySelectorAll('.add-to-cart').forEach(function(button) {
-            button.addEventListener('click', function() {
-                const productCard = this.closest('.product-card');
-                if (!productCard) return;
-                
-                const productName = productCard.dataset.productName;
-                console.log("Add to Cart clicked for:", productName);
-                
-                // Make sure Salesforce is initialized
-                if (typeof window.SalesforceInteractions === 'undefined') {
-                    console.log("SalesforceInteractions not available");
-                    return;
-                }
-                
-                // Initialize first
-                window.SalesforceInteractions.init({ 
-                    consents: [{ 
-                        provider: "CampaignAttribution", 
-                        purpose: "Tracking", 
-                        status: "Opt In" 
-                    }] 
-                }).then(res => { 
-                    console.log('Initialization success, sending Add to Cart event'); 
-                    
-                    // Get UTM parameters
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const utm_source = urlParams.get('utm_source') || 'Meta Ads';
-                    const utm_campaign = urlParams.get('utm_campaign') || 'EMEA_GS_NonBrand_AppExchange_Mod';
-                    const utm_content = urlParams.get('utm_content') || 'Free webinar! Join!';
-                    
-                    // Send the Add to Cart event - exactly as in your example
-                    window.SalesforceInteractions.sendEvent({ 
-                        interaction: { 
-                            name: "Campaigns Events", 
-                            eventType: "campaignsEvents", 
-                            campaignName: utm_campaign, 
-                            campaignSource: utm_source, 
-                            campaignContent: utm_content, 
-                            custom1: "product_add_to_cart", 
-                            custom2: productName, 
-                            custom3: new Date().toISOString() 
-                        } 
-                    }).then(res => { 
-                        console.log('Add to Cart event sent successfully:', res); 
-                    }).catch(err => { 
-                        console.error('Add to Cart event sending error:', err); 
-                    });
-                }).catch(err => { 
-                    console.error('Initialization error:', err); 
-                });
-            });
-        });
-        
-        // Newsletter form
-        const newsletterForm = document.getElementById('newsletter-form');
-        if (newsletterForm) {
-            newsletterForm.addEventListener('submit', function(event) {
-                event.preventDefault();
-                
-                const emailInput = this.querySelector('input[type="email"]');
-                if (!emailInput || !emailInput.value) return;
-                
-                const email = emailInput.value;
-                console.log("Newsletter submitted with email:", email);
-                
-                // Make sure Salesforce is initialized
-                if (typeof window.SalesforceInteractions === 'undefined') {
-                    console.log("SalesforceInteractions not available");
-                    emailInput.value = '';
-                    alert('Thank you for subscribing to our newsletter!');
-                    return;
-                }
-                
-                // Initialize first
-                window.SalesforceInteractions.init({ 
-                    consents: [{ 
-                        provider: "CampaignAttribution", 
-                        purpose: "Tracking", 
-                        status: "Opt In" 
-                    }] 
-                }).then(res => { 
-                    console.log('Initialization success, sending Newsletter event'); 
-                    
-                    // Get UTM parameters
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const utm_source = urlParams.get('utm_source') || 'Meta Ads';
-                    const utm_campaign = urlParams.get('utm_campaign') || 'EMEA_GS_NonBrand_AppExchange_Mod';
-                    const utm_content = urlParams.get('utm_content') || 'Free webinar! Join!';
-                    
-                    // Send the Newsletter event - exactly as in your example
-                    window.SalesforceInteractions.sendEvent({ 
-                        interaction: { 
-                            name: "Campaigns Events", 
-                            eventType: "campaignsEvents", 
-                            campaignName: utm_campaign, 
-                            campaignSource: utm_source, 
-                            campaignContent: utm_content, 
-                            custom1: "Newsletter Signup", 
-                            custom2: "Homepage Newsletter", 
-                            custom3: new Date().toISOString() 
-                        } 
-                    }).then(res => { 
-                        console.log('Newsletter event sent successfully:', res); 
-                        emailInput.value = '';
-                        alert('Thank you for subscribing to our newsletter!');
-                    }).catch(err => { 
-                        console.error('Newsletter event sending error:', err); 
-                        emailInput.value = '';
-                        alert('Thank you for subscribing to our newsletter!');
-                    });
-                }).catch(err => { 
-                    console.error('Initialization error:', err); 
-                    emailInput.value = '';
-                    alert('Thank you for subscribing to our newsletter!');
-                });
+                log('❌ Initialization error: ' + JSON.stringify(err)); 
             });
         }
         
-        // Try to initialize on page load
-        if (typeof window.SalesforceInteractions !== 'undefined') {
-            console.log("SalesforceInteractions available immediately");
-            initializeSalesforce();
-        } else {
-            console.log("SalesforceInteractions not available immediately, will try periodically");
+        // Send identity event
+        function sendIdentity() {
+            if (!apiAvailable || !consentInitialized) {
+                log('Cannot send identity - API not available or consent not initialized');
+                return;
+            }
             
-            let attempts = 0;
-            const interval = setInterval(function() {
-                attempts++;
-                console.log(`Checking for SalesforceInteractions (${attempts}/10)`);
-                
-                if (typeof window.SalesforceInteractions !== 'undefined') {
-                    console.log("SalesforceInteractions now available");
-                    clearInterval(interval);
-                    initializeSalesforce();
+            if (identitySent) {
+                log('Identity already sent, skipping');
+                return;
+            }
+            
+            log('Sending identity event...');
+            
+            // Check if user is logged in
+            const currentUser = localStorage.getItem('ntoCurrentUser');
+            let firstName = 'Anonymous';
+            let lastName = 'User';
+            let email = 'anonymous@example.com';
+            let isAnonymous = 1;
+            
+            if (currentUser) {
+                try {
+                    const parsedUser = JSON.parse(currentUser);
+                    firstName = parsedUser.name.split(' ')[0] || 'Anonymous';
+                    lastName = parsedUser.name.split(' ')[1] || 'User';
+                    email = parsedUser.email || 'anonymous@example.com';
+                    isAnonymous = 0;
+                    log('Found logged in user: ' + firstName + ' ' + lastName);
+                } catch (e) {
+                    log('Error parsing user data: ' + e.message);
                 }
+            } else {
+                log('No logged in user, using anonymous identity');
+            }
+            
+            // Send identity event - EXACTLY as provided in your example
+            window.SalesforceInteractions.sendEvent({ 
+                user: { 
+                    attributes: { 
+                        eventType: 'identity', 
+                        firstName: firstName, 
+                        lastName: lastName, 
+                        email: email, 
+                        isAnonymous: isAnonymous
+                    } 
+                } 
+            }).then(res => {
+                log('✅ Identity event sent successfully: ' + JSON.stringify(res));
+                identitySent = true;
+            }).catch(err => {
+                log('❌ Identity event error: ' + JSON.stringify(err));
+            });
+        }
+        
+        // Send campaign event exactly as in your example
+        function sendCampaignEvent(eventType, customValue, additionalData = '') {
+            if (!apiAvailable || !consentInitialized || !identitySent) {
+                log('Cannot send campaign event - prerequisites not met');
+                log(`API available: ${apiAvailable}, Consent initialized: ${consentInitialized}, Identity sent: ${identitySent}`);
+                return;
+            }
+            
+            log(`Sending ${eventType} event...`);
+            
+            // Get UTM parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const utm_source = urlParams.get('utm_source') || 'Meta Ads';
+            const utm_campaign = urlParams.get('utm_campaign') || 'EMEA_GS_NonBrand_AppExchange_Mod';
+            const utm_content = urlParams.get('utm_content') || 'Free webinar! Join!';
+            
+            // EXACTLY as provided in your example
+            window.SalesforceInteractions.sendEvent({ 
+                interaction: { 
+                    name: "Campaigns Events", 
+                    eventType: "campaignsEvents", 
+                    campaignName: utm_campaign, 
+                    campaignSource: utm_source, 
+                    campaignContent: utm_content, 
+                    custom1: customValue, 
+                    custom2: additionalData || customValue, 
+                    custom3: new Date().toISOString() 
+                } 
+            }).then(res => { 
+                log(`✅ ${eventType} event sent successfully: ` + JSON.stringify(res)); 
+            }).catch(err => { 
+                log(`❌ ${eventType} event sending error: ` + JSON.stringify(err)); 
+            });
+        }
+        
+        // Setup event listeners for buttons
+        function setupEventHandlers() {
+            log('Setting up event handlers...');
+            
+            // Add to Cart buttons
+            document.querySelectorAll('.add-to-cart').forEach((button, index) => {
+                button.addEventListener('click', function() {
+                    const productCard = this.closest('.product-card');
+                    if (productCard) {
+                        const productName = productCard.dataset.productName;
+                        log(`Add to Cart clicked for: ${productName}`);
+                        
+                        // Send campaign event for Add to Cart
+                        sendCampaignEvent('Add to Cart', 'product_add_to_cart', productName);
+                    }
+                });
+            });
+            
+            // Newsletter form
+            const newsletterForm = document.getElementById('newsletter-form');
+            if (newsletterForm) {
+                log('Newsletter form found, attaching submit handler');
+                newsletterForm.addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    
+                    const emailInput = this.querySelector('input[type="email"]');
+                    if (emailInput && emailInput.value) {
+                        const email = emailInput.value;
+                        log(`Newsletter signup with email: ${email}`);
+                        
+                        // Send campaign event for Newsletter Signup
+                        sendCampaignEvent('Newsletter Signup', 'Newsletter Signup', 'Homepage Newsletter');
+                        
+                        // Clear form and show confirmation
+                        emailInput.value = '';
+                        alert('Thank you for subscribing to our newsletter!');
+                    }
+                });
+            } else {
+                log('WARNING: Newsletter form not found!');
+            }
+        }
+        
+        // Initial API check with retry logic (mirror the test page's approach)
+        function initializeWithRetry() {
+            log('Initializing application with retry logic...');
+            
+            // First check if API is already available
+            if (checkApi()) {
+                initializeConsent();
+                return;
+            }
+            
+            // Set up periodic checking for Salesforce Interactions (1 second intervals)
+            let checkCount = 0;
+            const maxChecks = 20;
+            
+            const checkInterval = setInterval(function() {
+                checkCount++;
+                log(`Check attempt ${checkCount}/${maxChecks} for SalesforceInteractions API...`);
                 
-                if (attempts >= 10) {
-                    console.log("SalesforceInteractions not available after 10 attempts");
-                    clearInterval(interval);
+                if (checkApi()) {
+                    clearInterval(checkInterval);
+                    initializeConsent();
+                } else if (checkCount >= maxChecks) {
+                    log(`API still not available after ${maxChecks} checks`);
+                    clearInterval(checkInterval);
                 }
             }, 1000);
         }
-    });
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            log('DOMContentLoaded event fired');
+            
+            // Set up event handlers
+            setupEventHandlers();
+            
+            // Start initialization with retry
+            initializeWithRetry();
+        });
+        
+        // Expose debug functions to console
+        window.sfDebug = {
+            checkApi: checkApi,
+            initializeConsent: initializeConsent,
+            sendIdentity: sendIdentity,
+            testAddToCart: function(index = 0) {
+                const buttons = document.querySelectorAll('.add-to-cart');
+                if (buttons.length > 0) {
+                    buttons[index].click();
+                    return true;
+                }
+                return false;
+            },
+            testNewsletter: function(email = 'test@example.com') {
+                const form = document.getElementById('newsletter-form');
+                if (form) {
+                    const emailInput = form.querySelector('input[type="email"]');
+                    if (emailInput) {
+                        emailInput.value = email;
+                        form.dispatchEvent(new Event('submit'));
+                        return true;
+                    }
+                }
+                return false;
+            },
+            getStatus: function() {
+                return {
+                    apiAvailable: apiAvailable,
+                    consentInitialized: consentInitialized,
+                    identitySent: identitySent
+                };
+            }
+        };
+        
+        log('Script setup complete');
     </script>
 </body>
 </html>
