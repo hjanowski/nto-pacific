@@ -1,222 +1,630 @@
-// script.js — Enhanced Salesforce event queuing + existing functionality preserved
-'use strict';
+// Connect the "Shop Now" button to the catalog page
+document.addEventListener('DOMContentLoaded', () => {
+    const shopNowBtn = document.getElementById('shop-now-btn');
+    if (shopNowBtn) {
+        shopNowBtn.addEventListener('click', () => {
+            window.location.href = 'catalog.html';
+        });
+    }
+});
 
-// -- Global state
-const state = {
-  cart: [],
-  cartCount: 0,
-  cartTotal: 0,
-  currentUser: null,
-  currentProductNotify: null,
-  salesforceInitialized: false,  // Track if Salesforce init succeeded
-  identitySent: false,          // Track if identity event sent
-  sfEventQueue: []              // Queue events fired before ready
+// Salesforce Interactions beacon script
+// <script src="https://cdn.c360a.salesforce.com/beacon/c360a/233a8f36-3f93-4e01-84e5-c210837a6c97/scripts/c360a.min.js"></script>
+
+// Simple debug function to make logs more visible
+function debugLog(message) {
+    console.log('%c[NTO DEBUG] ' + message, 'background: #f0f0f0; color: #0a66c2; font-weight: bold; padding: 3px 5px; border-radius: 3px;');
+}
+
+// Test logging
+debugLog('Script started - console logging is working');
+
+// Define getUTMParameters globally so it's accessible to all functions
+function getUTMParameters() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return {
+        utm_source: urlParams.get('utm_source') || '',
+        utm_medium: urlParams.get('utm_medium') || '',
+        utm_campaign: urlParams.get('utm_campaign') || '',
+        utm_content: urlParams.get('utm_content') || '',
+        utm_term: urlParams.get('utm_term') || ''
+    };
+}
+
+// Check if SalesforceInteractions is available
+function checkSalesforceInteractions() {
+    if (typeof window.SalesforceInteractions === 'undefined') {
+        debugLog('⚠️ SalesforceInteractions is NOT available');
+        return false;
+    }
+    
+    if (typeof window.SalesforceInteractions.sendEvent !== 'function') {
+        debugLog('⚠️ SalesforceInteractions.sendEvent is NOT a function');
+        return false;
+    }
+    
+    debugLog('✅ SalesforceInteractions is available and ready');
+    return true;
+}
+
+// Ensure SalesforceInteractions is initialized
+function ensureSalesforceInitialized() {
+    return new Promise((resolve, reject) => {
+        // Check if SalesforceInteractions is already initialized
+        if (window.SalesforceInteractions && typeof window.SalesforceInteractions.sendEvent === 'function') {
+            resolve();
+            return;
+        }
+
+        // If not, wait a bit and check again (retry pattern)
+        let attempts = 0;
+        const maxAttempts = 5;
+        const checkInterval = setInterval(() => {
+            attempts++;
+            if (window.SalesforceInteractions && typeof window.SalesforceInteractions.sendEvent === 'function') {
+                clearInterval(checkInterval);
+                resolve();
+            } else if (attempts >= maxAttempts) {
+                clearInterval(checkInterval);
+                reject(new Error('SalesforceInteractions not initialized after multiple attempts'));
+            }
+        }, 1000);
+    });
+}
+
+// Keep track of handler attachment to prevent duplicates
+let handlersAttached = false;
+
+// Check if user is already logged in
+const currentUser = localStorage.getItem('ntoCurrentUser');
+if (currentUser) {
+    debugLog('User is logged in, initializing identity');
+    try {
+        const parseduser = JSON.parse(currentUser);
+        const Firstname = parseduser.name.split(" ")[0];
+        const Lastname = parseduser.name.split(" ")[1];
+        const Email = parseduser.email;
+
+        // Initialize Salesforce with consent if not already initialized
+        ensureSalesforceInitialized()
+            .then(() => {
+                return SalesforceInteractions.init({
+                    consents: [{
+                        provider: "CampaignAttribution",
+                        purpose: "Tracking",
+                        status: "Opt In"
+                    }]
+                });
+            })
+            .then(res => {
+                debugLog("Initialization successful");
+                // Send identity event
+                return SalesforceInteractions.sendEvent({
+                    user: {
+                        attributes: {
+                            eventType: 'identity',
+                            firstName: Firstname,
+                            lastName: Lastname,
+                            email: Email,
+                            isAnonymous: 0
+                        }
+                    }
+                });
+            })
+            .then(res => {
+                debugLog("Identity event sent successfully");
+            })
+            .catch(err => {
+                debugLog('⚠️ Error in user initialization flow: ' + (err.message || err));
+            });
+    } catch (error) {
+        debugLog('⚠️ Error processing user data: ' + (error.message || error));
+    }
+} else {
+    debugLog('User is not logged in');
+}
+
+// Function to attach all event handlers
+function attachEventHandlers() {
+    if (handlersAttached) {
+        debugLog('Event handlers already attached, skipping');
+        return;
+    }
+
+    debugLog('Attaching all event handlers');
+    
+    // 1. Shop Now button handler
+    const shopNowBtn = document.getElementById('shop-now-btn');
+    if (shopNowBtn) {
+        debugLog('Shop Now button found, attaching event listener');
+        shopNowBtn.addEventListener('click', () => {
+            debugLog('Shop Now button clicked');
+            
+            // Get UTM parameters before navigation
+            const utmParams = getUTMParameters();
+            debugLog('UTM Parameters for Shop Now click: ' + JSON.stringify(utmParams));
+            
+            // Try to send event before navigation
+            if (checkSalesforceInteractions()) {
+                SalesforceInteractions.sendEvent({
+                    interaction: {
+                        name: "Campaigns Events",
+                        eventType: "campaignsEvents",
+                        campaignName: utmParams.utm_campaign || "",
+                        campaignSource: utmParams.utm_source || "",
+                        campaignContent: utmParams.utm_content || "",
+                        custom1: "shop_now_click",
+                        custom2: "homepage_hero",
+                        custom3: new Date().toISOString()
+                    }
+                }).then(() => {
+                    debugLog('Shop Now click event sent successfully');
+                    window.location.href = 'catalog.html';
+                }).catch(err => {
+                    debugLog('⚠️ Error sending Shop Now click event: ' + (err.message || err));
+                    window.location.href = 'catalog.html';
+                });
+            } else {
+                window.location.href = 'catalog.html';
+            }
+        });
+    } else {
+        debugLog('⚠️ Shop Now button not found in the DOM');
+    }
+    
+    // 2. Add to Cart event tracking
+    const addToCartButtons = document.querySelectorAll('.add-to-cart');
+    if (addToCartButtons.length > 0) {
+        debugLog(`Found ${addToCartButtons.length} Add to Cart buttons, attaching event listeners`);
+        
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', async (event) => {
+                debugLog('Add to Cart button clicked!');
+                
+                try {
+                    // Get the product data from the parent product card
+                    const productCard = button.closest('.product-card');
+                    if (!productCard) {
+                        debugLog('⚠️ Cannot find parent product card');
+                        return;
+                    }
+                    
+                    const productId = productCard.dataset.productId;
+                    const productName = productCard.dataset.productName;
+                    const productPrice = productCard.dataset.productPrice;
+                    
+                    debugLog(`Product: ${productName} (${productId}) - $${productPrice}`);
+                    
+                    // Get UTM parameters from URL
+                    const utmParams = getUTMParameters();
+                    debugLog('UTM Parameters for Add to Cart: ' + JSON.stringify(utmParams));
+                    
+                    try {
+                        // Ensure Salesforce is initialized before sending
+                        await ensureSalesforceInitialized();
+                        
+                        // Try first format - using interaction property
+                        const interactionPayload = {
+                            interaction: {
+                                name: "Campaigns Events",
+                                eventType: "campaignsEvents",
+                                campaignName: utmParams.utm_campaign || "",
+                                campaignSource: utmParams.utm_source || "",
+                                campaignMedium: utmParams.utm_medium || "",
+                                campaignContent: utmParams.utm_content || "",
+                                campaignTerm: utmParams.utm_term || "",
+                                custom1: "product_add_to_cart",
+                                custom2: productName,
+                                custom3: parseFloat(productPrice)
+                            }
+                        };
+                        
+                        debugLog('Sending event with payload (interaction format):', interactionPayload);
+                        
+                        // Send the event using the interaction format
+                        window.SalesforceInteractions.sendEvent(interactionPayload)
+                            .then(res => {
+                                debugLog('✅ Add to Cart event sent successfully (interaction format)');
+                                
+                                // Show cart confirmation or update cart count here
+                                const cartCount = document.querySelector('.cart-count');
+                                if (cartCount) {
+                                    const currentCount = parseInt(cartCount.textContent || '0');
+                                    cartCount.textContent = currentCount + 1;
+                                }
+                            })
+                            .catch(err => {
+                                debugLog('⚠️ Failed to send event (interaction format): ' + (err.message || err));
+                                
+                                // Try second format if first fails - using event property
+                                debugLog('Attempting alternative format...');
+                                const eventPayload = {
+                                    event: {
+                                        name: "Add to Cart",
+                                        eventType: "Behavioral",
+                                        campaignName: utmParams.utm_campaign || "",
+                                        campaignSource: utmParams.utm_source || "",
+                                        campaignContent: utmParams.utm_content || "",
+                                        custom1: "product_add_to_cart",
+                                        custom2: productName,
+                                        custom3: parseFloat(productPrice)
+                                    }
+                                };
+                                
+                                window.SalesforceInteractions.sendEvent(eventPayload)
+                                    .then(res => {
+                                        debugLog('✅ Add to Cart event sent successfully (event format)');
+                                        
+                                        // Update cart count here too
+                                        const cartCount = document.querySelector('.cart-count');
+                                        if (cartCount) {
+                                            const currentCount = parseInt(cartCount.textContent || '0');
+                                            cartCount.textContent = currentCount + 1;
+                                        }
+                                    })
+                                    .catch(alternativeErr => {
+                                        debugLog('⚠️ Failed to send event (event format): ' + (alternativeErr.message || alternativeErr));
+                                    });
+                            });
+                    } catch (initError) {
+                        debugLog('⚠️ Salesforce initialization error: ' + (initError.message || initError));
+                    }
+                } catch (error) {
+                    debugLog('⚠️ Error in Add to Cart event handling: ' + (error.message || error));
+                }
+            });
+        });
+    } else {
+        debugLog('⚠️ No Add to Cart buttons found');
+    }
+    
+    // 3. Newsletter signup event tracking
+    const newsletterForm = document.getElementById('newsletter-form');
+    if (newsletterForm) {
+        debugLog('Newsletter form found, attaching event listener');
+        
+        newsletterForm.addEventListener('submit', function(event) {
+            debugLog('Newsletter form submitted');
+            event.preventDefault(); // Prevent the default form submission
+            
+            try {
+                // Get the email input value
+                const emailInput = newsletterForm.querySelector('input[type="email"]');
+                if (!emailInput) {
+                    debugLog('⚠️ Email input not found in the newsletter form');
+                    return;
+                }
+                
+                const userEmail = emailInput.value;
+                debugLog(`Email value: "${userEmail}"`);
+                
+                if (!userEmail) {
+                    debugLog('⚠️ Email input is empty');
+                    return;
+                }
+                
+                // Get UTM parameters from URL
+                const utmParams = getUTMParameters();
+                debugLog('UTM Parameters for Newsletter: ' + JSON.stringify(utmParams));
+                
+                // Ensure Salesforce is initialized
+                ensureSalesforceInitialized()
+                    .then(() => {
+                        // Send the "Newsletter Signup" event to Salesforce Interactions
+                        return window.SalesforceInteractions.sendEvent({
+                            interaction: {
+                                name: "Campaigns Events",
+                                eventType: "campaignsEvents",
+                                campaignName: utmParams.utm_campaign || "",
+                                campaignSource: utmParams.utm_source || "",
+                                campaignMedium: utmParams.utm_medium || "",
+                                campaignContent: utmParams.utm_content || "",
+                                campaignTerm: utmParams.utm_term || "",
+                                custom1: "newsletter_signup",
+                                custom2: "homepage_footer",
+                                custom3: userEmail
+                            }
+                        });
+                    })
+                    .then(res => {
+                        debugLog('✅ Newsletter event sent successfully!');
+                        
+                        // Clear the form
+                        emailInput.value = '';
+                        
+                        // Show a confirmation modal or message
+                        const confirmationModal = document.getElementById('confirmation-modal');
+                        const confirmationText = document.getElementById('confirmation-text');
+                        if (confirmationModal && confirmationText) {
+                            confirmationText.textContent = 'You have been subscribed to our newsletter!';
+                            confirmationModal.style.display = 'block';
+                            document.querySelector('.overlay').style.display = 'block';
+                        } else {
+                            // Fallback to alert if modal not found
+                            alert('Thank you for subscribing to our newsletter!');
+                        }
+                    })
+                    .catch(err => {
+                        debugLog('⚠️ Newsletter event sending error: ' + (err.message || err));
+                        // Still show confirmation
+                        alert('Thank you for subscribing to our newsletter!');
+                    });
+            } catch (error) {
+                debugLog('⚠️ Error in Newsletter event handling: ' + (error.message || error));
+                alert('Thank you for subscribing to our newsletter!');
+            }
+        });
+        
+        debugLog('Newsletter form submit handler attached');
+    } else {
+        debugLog('⚠️ Newsletter form not found');
+    }
+    
+    // 4. Notify Me button event tracking
+    const notifyButtons = document.querySelectorAll('.notify-me');
+    if (notifyButtons.length > 0) {
+        debugLog(`Found ${notifyButtons.length} Notify Me buttons, attaching event listeners`);
+        
+        notifyButtons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                debugLog('Notify Me button clicked!');
+                
+                try {
+                    // Get the product data
+                    const productCard = button.closest('.product-card');
+                    if (!productCard) {
+                        debugLog('⚠️ Cannot find parent product card');
+                        return;
+                    }
+                    
+                    const productId = productCard.dataset.productId;
+                    const productName = productCard.dataset.productName;
+                    
+                    // Show notify modal
+                    const notifyModal = document.getElementById('notify-modal');
+                    const notifyProductName = document.getElementById('notify-product-name');
+                    
+                    if (notifyModal && notifyProductName) {
+                        notifyProductName.textContent = productName;
+                        notifyModal.style.display = 'block';
+                        document.querySelector('.overlay').style.display = 'block';
+                    }
+                    
+                    // Get UTM parameters from URL for later use when form is submitted
+                    const utmParams = getUTMParameters();
+                    debugLog('UTM Parameters for Notify Me: ' + JSON.stringify(utmParams));
+                    
+                    // Store UTM parameters for the notify form submission
+                    window.notifyUtmParams = utmParams;
+                } catch (error) {
+                    debugLog('⚠️ Error in Notify Me button handling: ' + (error.message || error));
+                }
+            });
+        });
+        
+        // Handle the notify form submission
+        const notifyForm = document.getElementById('notify-form');
+        if (notifyForm) {
+            notifyForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const notifyEmail = document.getElementById('notify-email').value;
+                const productName = document.getElementById('notify-product-name').textContent;
+                
+                if (!notifyEmail) {
+                    debugLog('⚠️ Notify email is empty');
+                    return;
+                }
+                
+                // Get stored UTM parameters
+                const utmParams = window.notifyUtmParams || getUTMParameters();
+                
+                // Send event to Salesforce
+                if (checkSalesforceInteractions()) {
+                    window.SalesforceInteractions.sendEvent({
+                        interaction: {
+                            name: "Campaigns Events",
+                            eventType: "campaignsEvents",
+                            campaignName: utmParams.utm_campaign || "",
+                            campaignSource: utmParams.utm_source || "",
+                            campaignContent: utmParams.utm_content || "",
+                            custom1: "product_notification",
+                            custom2: productName,
+                            custom3: notifyEmail
+                        }
+                    }).then(() => {
+                        debugLog('✅ Notify Me event sent successfully');
+                        
+                        // Close the notify modal
+                        document.getElementById('notify-modal').style.display = 'none';
+                        
+                        // Show confirmation
+                        const confirmationModal = document.getElementById('confirmation-modal');
+                        const confirmationText = document.getElementById('confirmation-text');
+                        if (confirmationModal && confirmationText) {
+                            confirmationText.textContent = `We'll notify you when ${productName} becomes available.`;
+                            confirmationModal.style.display = 'block';
+                        } else {
+                            alert(`We'll notify you when ${productName} becomes available.`);
+                        }
+                    }).catch(err => {
+                        debugLog('⚠️ Error sending Notify Me event: ' + (err.message || err));
+                        alert(`We'll notify you when ${productName} becomes available.`);
+                    });
+                } else {
+                    alert(`We'll notify you when ${productName} becomes available.`);
+                }
+            });
+        }
+    }
+    
+    // 5. Login/Signup modal handling
+    const loginBtn = document.getElementById('login-btn');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', () => {
+            document.getElementById('login-modal').style.display = 'block';
+            document.querySelector('.overlay').style.display = 'block';
+        });
+    }
+    
+    const showSignupLink = document.getElementById('show-signup');
+    if (showSignupLink) {
+        showSignupLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('login-modal').style.display = 'none';
+            document.getElementById('signup-modal').style.display = 'block';
+        });
+    }
+    
+    const showLoginLink = document.getElementById('show-login');
+    if (showLoginLink) {
+        showLoginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('signup-modal').style.display = 'none';
+            document.getElementById('login-modal').style.display = 'block';
+        });
+    }
+    
+    // Close modal buttons
+    const closeButtons = document.querySelectorAll('.close-modal, .close-confirmation');
+    closeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Close all modals
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                modal.style.display = 'none';
+            });
+            document.querySelector('.overlay').style.display = 'none';
+        });
+    });
+    
+    // Handle login form submission with UTM parameters
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Get UTM parameters
+            const utmParams = getUTMParameters();
+            
+            // Process login and track with UTM parameters
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Here you would normally validate and authenticate the user
+            debugLog(`Login attempt: ${email}`);
+            
+            if (checkSalesforceInteractions()) {
+                window.SalesforceInteractions.sendEvent({
+                    interaction: {
+                        name: "Campaigns Events",
+                        eventType: "campaignsEvents",
+                        campaignName: utmParams.utm_campaign || "",
+                        campaignSource: utmParams.utm_source || "",
+                        campaignContent: utmParams.utm_content || "",
+                        custom1: "user_login",
+                        custom2: email,
+                        custom3: new Date().toISOString()
+                    }
+                }).then(() => {
+                    debugLog('✅ Login event sent successfully');
+                }).catch(err => {
+                    debugLog('⚠️ Error sending login event: ' + (err.message || err));
+                });
+            }
+            
+            // Close modals
+            document.getElementById('login-modal').style.display = 'none';
+            document.querySelector('.overlay').style.display = 'none';
+        });
+    }
+    
+    // Handle signup form submission with UTM parameters
+    const signupForm = document.getElementById('signup-form');
+    if (signupForm) {
+        signupForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Get UTM parameters
+            const utmParams = getUTMParameters();
+            
+            // Process signup and track with UTM parameters
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            
+            // Here you would normally create a user account
+            debugLog(`Signup attempt: ${email}, ${name}`);
+            
+            if (checkSalesforceInteractions()) {
+                window.SalesforceInteractions.sendEvent({
+                    interaction: {
+                        name: "Campaigns Events",
+                        eventType: "campaignsEvents",
+                        campaignName: utmParams.utm_campaign || "",
+                        campaignSource: utmParams.utm_source || "",
+                        campaignContent: utmParams.utm_content || "",
+                        custom1: "user_signup",
+                        custom2: email,
+                        custom3: new Date().toISOString()
+                    }
+                }).then(() => {
+                    debugLog('✅ Signup event sent successfully');
+                }).catch(err => {
+                    debugLog('⚠️ Error sending signup event: ' + (err.message || err));
+                });
+            }
+            
+            // Close modals
+            document.getElementById('signup-modal').style.display = 'none';
+            document.querySelector('.overlay').style.display = 'none';
+        });
+    }
+    
+    handlersAttached = true;
+    debugLog('All event handlers attached successfully');
+}
+
+// Ensure handlers are attached after DOM is fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    debugLog('DOMContentLoaded event fired');
+    attachEventHandlers();
+});
+
+// Backup approach in case DOMContentLoaded already fired
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    debugLog('Document already loaded, attaching handlers immediately');
+    setTimeout(attachEventHandlers, 0);
+}
+
+// Expose a test function globally for debugging via console
+window.testNewsletterSubmit = function() {
+    debugLog('Manual newsletter submit test triggered');
+    const form = document.getElementById('newsletter-form');
+    if (form) {
+        const emailInput = form.querySelector('input[type="email"]');
+        if (emailInput && !emailInput.value) {
+            emailInput.value = 'test@example.com';
+        }
+        debugLog('Triggering submit event on newsletter form');
+        form.dispatchEvent(new Event('submit'));
+    } else {
+        debugLog('Cannot find newsletter form for testing');
+    }
 };
 
-// -- Logging helper
-function log(message, type = 'info') {
-  const timestamp = new Date().toLocaleTimeString();
-  const prefix = `[${timestamp}]`;
-  switch (type) {
-    case 'error': console.error(`${prefix} ❌ ${message}`); break;
-    case 'success': console.log(`${prefix} ✅ ${message}`); break;
-    case 'info': console.log(`${prefix} ℹ️ ${message}`); break;
-    case 'event': console.log(`${prefix} 🎯 EVENT: ${message}`); break;
-    default: console.log(`${prefix} ${message}`);
-  }
-}
+// Check SalesforceInteractions periodically 
+let checkCount = 0;
+const maxChecks = 5;
+const checkInterval = setInterval(function() {
+    checkCount++;
+    if (checkSalesforceInteractions()) {
+        debugLog(`SalesforceInteractions became available after ${checkCount} checks`);
+        clearInterval(checkInterval);
+    } else if (checkCount >= maxChecks) {
+        debugLog(`SalesforceInteractions still not available after ${maxChecks} checks`);
+        clearInterval(checkInterval);
+    }
+}, 1000);
 
-// -- DOM selectors
-function $(sel) { return document.querySelector(sel); }
-function $$(sel) { return Array.from(document.querySelectorAll(sel)); }
-
-// -- Modal controls
-function openModal(id) {
-  log(`Opening modal: ${id}`, 'event');
-  const m = document.getElementById(id);
-  const o = $('.overlay');
-  if (m) m.style.display='block';
-  if (o) o.style.display='block';
-}
-function closeModal(id) {
-  log(`Closing modal: ${id}`, 'event');
-  const m = document.getElementById(id);
-  if (m) m.style.display='none';
-  const any = $$('.modal').some(x=>x.style.display==='block');
-  const o = $('.overlay'); if (!any && o) o.style.display='none';
-}
-function closeAllModals() {
-  log('Closing all modals','event');
-  $$('.modal').forEach(m=>m.style.display='none');
-  const o = $('.overlay'); if (o) o.style.display='none';
-}
-
-// -- Confirmation
-function showConfirmation(msg) {
-  log(`Confirmation: ${msg}`,'event');
-  const t = $('#confirmation-text'); if (t) t.textContent=msg;
-  openModal('confirmation-modal');
-}
-function closeConfirmationModal() {
-  log('Closing confirmation modal','event');
-  closeModal('confirmation-modal');
-}
-
-// -- Salesforce init + identity
-function startSalesforce() {
-  log('Starting Salesforce SDK','info');
-  let tries=0, max=20;
-  (function check(){
-    if (window.SalesforceInteractions && typeof window.SalesforceInteractions.init==='function'){
-      log('SalesforceInteractions loaded','success'); initConsent();
-    } else if(++tries<max){
-      log(`Retrying SDK load (${tries}/${max})`,'info'); setTimeout(check,1000);
-    } else log('Failed to load SalesforceInteractions SDK','error');
-  })();
-}
-function initConsent(){
-  log('Initializing consent','info');
-  window.SalesforceInteractions.init({
-    consents:[{provider:'CampaignAttribution',purpose:'Tracking',status:'Opt In'}]
-  })
-  .then(res=>{ log('Consent OK','success'); state.salesforceInitialized=true; sendIdentity(); })
-  .catch(e=>log(`Consent error: ${e}`,'error'));
-}
-function sendIdentity(){
-  if(!state.salesforceInitialized){ log('Cannot send identity; SDK not ready','error'); return; }
-  if(state.identitySent){ log('Identity already sent; skipping','info'); return; }
-  log('Sending identity event','info');
-  window.SalesforceInteractions.sendEvent({
-    user:{attributes:{eventType:'identity',email:state.currentUser?.email||'',isAnonymous:!state.currentUser}}
-  })
-    .then(()=>{
-      log('Identity sent','success'); state.identitySent=true; drainSfQueue();
-    })
-    .catch(e=>log(`Identity error: ${e}`,'error'));
-}
-function canSendSf(){ return state.salesforceInitialized && state.identitySent; }
-function drainSfQueue(){
-  log(`Draining SF queue (${state.sfEventQueue.length} events)`,'info');
-  state.sfEventQueue.forEach(evt=>{ _sendSf(evt.type,evt.data); });
-  state.sfEventQueue=[];
-}
-function _sendSf(type,data){
-  log(`Sending SF event: ${type}`,'event');
-  // UTM fallback
-  const urlParams=new URLSearchParams(window.location.search);
-  const utm_source=urlParams.get('utm_source')||'Default';
-  const utm_campaign=urlParams.get('utm_campaign')||'Default';
-  const utm_content=urlParams.get('utm_content')||'Default';
-  const payload={interaction:{
-    name:'Campaigns Events',eventType:'campaignsEvents',
-    campaignName:utm_campaign,campaignSource:utm_source,campaignContent:utm_content,
-    custom1:type,custom2:data.product||data.email,custom3:new Date().toISOString()
-  }};
-  window.SalesforceInteractions.sendEvent(payload)
-    .then(r=>log(`SF ${type} OK`,'success'))
-    .catch(e=>log(`SF ${type} error: ${e}`,'error'));
-}
-function sendSalesforceEvent(type,data){
-  if(!window.SalesforceInteractions){ log('SF SDK missing; cannot send','error'); return; }
-  if(canSendSf()){ _sendSf(type,data); }
-  else { log(`Queuing SF event: ${type}`,'info'); state.sfEventQueue.push({type,data}); }
-}
-
-// -- Authentication toggles
-function switchToSignup(e){ e.preventDefault(); closeModal('login-modal'); openModal('signup-modal'); }
-function switchToLogin(e){ e.preventDefault(); closeModal('signup-modal'); openModal('login-modal'); }
-function onLoginButton(){ log('Login button clicked','event'); if(state.currentUser) showLogoutConfirmation(); else openModal('login-modal'); }
-function showLogoutConfirmation(){
-  log('Prompting logout','event');
-  if(confirm('Logout?')){
-    log('Confirmed logout','info');
-    state.currentUser=null; state.identitySent=false; localStorage.removeItem('ntoCurrentUser');
-    updateLoginButton(); sendIdentity(); showConfirmation('Logged out');
-  } else log('Logout canceled','info');
-}
-
-// -- Cart actions
-function onCartButton(){ log('Cart button clicked','event'); openModal('cart-modal'); updateCartDisplay(); }
-function onAddToCart(e){ log('Add to cart','event');
-  const card=e.target.closest('.product-card'); if(!card){ log('Card not found','error');return; }
-  const id=card.dataset.productId,name=card.dataset.productName,price=parseFloat(card.dataset.productPrice);
-  const ex=state.cart.find(x=>x.id===id);
-  if(ex){ ex.quantity++; log(`Incremented ${name}`,'success'); } else { state.cart.push({id,name,price,quantity:1}); log(`Added ${name}`,'success'); }
-  updateCartCount(); updateCartDisplay(); showConfirmation(`${name} added to cart`);
-  sendSalesforceEvent('product_add_to_cart',{product:name});
-}
-
-// -- Notify Me
-function onNotifyMe(e){ log('Notify me','event');
-  const card=e.target.closest('.product-card'); if(!card){ log('Card missing','error');return; }
-  state.currentProductNotify={id:card.dataset.productId,name:card.dataset.productName};
-  $('#notify-product-name').textContent=state.currentProductNotify.name;
-  openModal('notify-modal');
-}
-
-// -- Checkout
-function onCheckoutClick(){ log('Checkout click','event');
-  if(state.currentUser) { closeModal('cart-modal'); openModal('checkout-modal'); updateCheckoutSummary(); }
-  else { closeModal('cart-modal'); openModal('login-modal'); }
-}
-
-function updateCheckoutSummary(){ log('Updating checkout summary','info');
-  const el=$('.order-summary'); if(!el){ log('Summary el missing','error');return; }
-  let html='<h3>Order Summary</h3>',subtotal=0;
-  state.cart.forEach(it=>{ subtotal+=it.price*it.quantity; html+=`<div><span>${it.name} x${it.quantity}</span><span>$${(it.price*it.quantity).toFixed(2)}</span></div>`; });
-  const shipping=subtotal>0?10:0,total=subtotal+shipping;
-  html+=`<div>Subtotal: $${subtotal.toFixed(2)}</div><div>Shipping: $${shipping.toFixed(2)}</div><div>Total: $${total.toFixed(2)}</div>`;
-  el.innerHTML=html; log('Checkout summary set','success');
-}
-
-// -- Form handlers
-function handleLoginSubmit(e){e.preventDefault();log('Login submit','event');clearFormError(e.target);
-  const email=$('#email').value,pwd=$('#password').value; log(`Login attempt ${email}`,'info');
-  if(loginUser(email,pwd)){ log('Login ok','success');sendIdentity();closeModal('login-modal');updateLoginButton();showConfirmation('Logged in');e.target.reset(); }
-  else{ log('Login fail','error'); showFormError(e.target,'Invalid credentials'); }}
-function handleSignupSubmit(e){e.preventDefault();log('Signup submit','event');clearFormError(e.target);
-  const name=$('#name').value,email=$('#signup-email').value,pw=$('#signup-password').value,cpw=$('#confirm-password').value;
-  if(pw!==cpw){log('PW mismatch','error');return showFormError(e.target,'Passwords mismatch');}
-  if(!registerUser(name,email,pw)){log('Email exists','error');return showFormError(e.target,'Email already registered');}
-  log('Signup ok','success');sendIdentity();closeModal('signup-modal');updateLoginButton();showConfirmation('Account created');e.target.reset();}
-function handleNewsletterSubmit(e){e.preventDefault();const email=e.target.querySelector('input').value;log(`Newsletter ${email}`,'info');
-  sendSalesforceEvent('Newsletter Signup',{email});showConfirmation('Thanks for subscribing');e.target.reset();}
-function handleNotifySubmit(e){e.preventDefault();log('Notify submit','event');const email=$('#notify-email').value;log(`Notify ${email}`,'info');closeModal('notify-modal');showConfirmation(`We'll notify when ${state.currentProductNotify.name}`);e.target.reset();}
-function handleCheckoutSubmit(e){e.preventDefault();log('Checkout submit','event');
-  const total=state.cart.reduce((s,i)=>s+i.price*i.quantity,0);log(`Order total $${total}`,'info');
-  sendSalesforceEvent('purchase_complete',{product:`Order Total: $${total}`});closeModal('checkout-modal');showConfirmation('Order placed');state.cart=[];updateCartCount();updateCartDisplay();e.target.reset();}
-
-// -- UI updates
-function updateLoginButton(){log('Updating login button','info');const btn=$('#login-btn');if(!btn)return;btn.textContent=state.currentUser?state.currentUser.name.split(' ')[0]:'Login';}
-function updateCartCount(){state.cartCount=state.cart.reduce((s,i)=>s+i.quantity,0);const el=$('.cart-count');if(el)el.textContent=state.cartCount;}
-function updateCartDisplay(){log('Updating cart display','info');const itemsEl=$('#cart-items'),subEl=$('#cart-subtotal'),shipEl=$('#cart-shipping'),totEl=$('#cart-total');if(!itemsEl||!subEl||!shipEl||!totEl){log('Cart els missing','error');return;}itemsEl.innerHTML='';if(!state.cart.length){itemsEl.innerHTML='<p>Your cart is empty.</p>';subEl.textContent='$0.00';shipEl.textContent='$0.00';totEl.textContent='$0.00';$('#checkout-btn').disabled=true;return;}let subtotal=0;state.cart.forEach(item=>{subtotal+=item.price*item.quantity;const row=document.createElement('div');row.className='cart-item';row.innerHTML=`<span>${item.name} x${item.quantity}</span><span>$${(item.price*item.quantity).toFixed(2)}</span>`;itemsEl.append(row);} );const shipping=subtotal>0?10:0;subEl.textContent=`$${subtotal.toFixed(2)}`;shipEl.textContent=`$${shipping.toFixed(2)}`;totEl.textContent=`$${(subtotal+shipping).toFixed(2)}`;$('#checkout-btn').disabled=false;}
-
-// -- Auth & storage
-function initializeAuthState(){log('Init auth state','info');const u=localStorage.getItem('ntoCurrentUser');if(u){state.currentUser=JSON.parse(u);log(`Found user ${state.currentUser.name}`,'success');}else log('No user in storage','info');}
-function loginUser(email,pwd){log(`Login ${email}`,'info');const users=JSON.parse(localStorage.getItem('ntoUsers')||'[]');const u=users.find(x=>x.email===email&&x.password===pwd);if(u){state.currentUser={id:u.id,name:u.name,email:u.email};localStorage.setItem('ntoCurrentUser',JSON.stringify(state.currentUser));return true;}return false;}
-function registerUser(name,email,pw){log(`Register ${name}`,'info');const arr=JSON.parse(localStorage.getItem('ntoUsers')||'[]');if(arr.some(x=>x.email===email))return false;const u={id:Date.now().toString(),name,email,password:pw,createdAt:new Date().toISOString()};arr.push(u);localStorage.setItem('ntoUsers',JSON.stringify(arr));state.currentUser={id:u.id,name:u.name,email:u.email};localStorage.setItem('ntoCurrentUser',JSON.stringify(state.currentUser));return true;}
-
-// -- Form error display
-function showFormError(form,msg){log(`Form error: ${msg}`,'error');form.querySelectorAll('.form-error').forEach(e=>e.remove());const p=document.createElement('p');p.className='form-error';p.textContent=msg;form.prepend(p);}function clearFormError(form){form.querySelectorAll('.form-error').forEach(e=>e.remove());}
-
-// -- On DOM ready
-document.addEventListener('DOMContentLoaded',()=>{
-  log('=== PAGE LOAD ===','info'); initializeAuthState(); updateLoginButton(); updateCartCount();
-  // UI bindings
-  const loginBtn=$('#login-btn'); if(loginBtn)loginBtn.addEventListener('click',onLoginButton);
-  const cartBtn=$('#cart-btn'); if(cartBtn)cartBtn.addEventListener('click',onCartButton);
-  const overlay=$('.overlay'); if(overlay)overlay.addEventListener('click',closeAllModals);
-  $$('.close-modal').forEach(btn=>btn.addEventListener('click',e=>closeModal(e.target.closest('.modal').id)));
-  $$('.close-confirmation').forEach(btn=>btn.addEventListener('click',closeConfirmationModal));
-  $$('.add-to-cart').forEach(btn=>btn.addEventListener('click',onAddToCart));
-  $$('.notify-me').forEach(btn=>btn.addEventListener('click',onNotifyMe));
-  const checkoutBtn=$('#checkout-btn'); if(checkoutBtn)checkoutBtn.addEventListener('click',onCheckoutClick);
-  const loginForm=$('#login-form'); if(loginForm)loginForm.addEventListener('submit',handleLoginSubmit);
-  const signupForm=$('#signup-form'); if(signupForm)signupForm.addEventListener('submit',handleSignupSubmit);
-  const newsletterForms=['#newsletter-form','#newsletter-form-footer']; newsletterForms.forEach(sel=>{const f=$(sel); if(f)f.addEventListener('submit',handleNewsletterSubmit);});
-  const notifyForm=$('#notify-form'); if(notifyForm)notifyForm.addEventListener('submit',handleNotifySubmit);
-  const checkoutForm=$('#checkout-form'); if(checkoutForm)checkoutForm.addEventListener('submit',handleCheckoutSubmit);
-  const showSignupLink=$('#show-signup'); if(showSignupLink)showSignupLink.addEventListener('click',switchToSignup);
-  const showLoginLink=$('#show-login'); if(showLoginLink)showLoginLink.addEventListener('click',switchToLogin);
-  startSalesforce(); log('=== INIT COMPLETE ===','success');
-});
+debugLog('Initialization complete');
