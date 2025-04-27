@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NTO Pacific | Premium Diving Equipment</title>
-  <!-- Suppress favicon 404 -->
+  <!-- Suppress missing favicon -->
   <link rel="icon" href="data:;base64,iVBORw0KGgo=">
   <link rel="stylesheet" href="styles.css">
   <script src="script.js" defer></script>
@@ -127,73 +127,35 @@
   </footer>
 
   <!-- Modal Components -->
-  <div class="modal" id="login-modal"> ... </div>
-  <div class="modal" id="signup-modal"> ... </div>
-  <div class="modal" id="cart-modal"> ... </div>
-  <div class="modal" id="checkout-modal"> ... </div>
-  <div class="modal" id="notify-modal"> ... </div>
-  <div class="modal" id="confirmation-modal"> ... </div>
+  <div class="modal" id="login-modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2>Login to NTO Pacific</h2>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit" class="btn-primary btn-full">Login</button>
+      </form>
+      <p class="form-footer">Don't have an account? <a href="#" id="show-signup">Sign up</a></p>
+    </div>
+  </div>
 
-  <div class="overlay"></div>
-
-  <!-- Inline Salesforce init & event scripts -->
-  <script>
-    const log = (...args) => console.log('[SF]', ...args);
-    document.addEventListener('DOMContentLoaded', () => {
-      log('Checking SDK...');
-      let attempts = 0;
-      const max = 20;
-      const check = () => {
-        if (window.SalesforceInteractions &&
-            typeof window.SalesforceInteractions.sendEvent === 'function') {
-          log('SDK loaded');
-          initConsent();
-        } else if (++attempts < max) {
-          setTimeout(check, 1000);
-        } else {
-          log('SDK failed to load after attempts');
-        }
-      };
-      check();
-
-      function initConsent() {
-        log('Initializing consent...');
-        window.SalesforceInteractions.init({
-          consents:[{provider:'CampaignAttribution',purpose:'Tracking',status:'Opt In'}]
-        }).then(res => {
-          log('Consent init success', res);
-          sendIdentity();
-        }).catch(err => log('Consent init error', err));
-      }
-      function sendIdentity() {
-        log('Sending identity...');
-        window.SalesforceInteractions.sendEvent({user:{attributes:{eventType:'identity',email:'',isAnonymous:0}}})
-          .then(res => log('Identity sent', res))
-          .catch(err => log('Identity error', err));
-      }
-
-      // Wire add-to-cart
-      document.querySelectorAll('.add-to-cart').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const payload = {interaction:{name:'Campaigns Events',eventType:'campaignsEvents',campaignName:'Default',campaignSource:'Default',campaignContent:'Default',custom1:'product_add_to_cart',custom2:btn.closest('.product-card').dataset.productName,custom3:new Date().toISOString()}};
-          log('Sending Add-to-cart event:', payload);
-          window.SalesforceInteractions.sendEvent(payload)
-            .then(res => log('Add-to-cart success', res))
-            .catch(err => log('Add-to-cart error', err));
-        });
-      });
-
-      // Wire newsletter
-      document.getElementById('newsletter-form-footer').addEventListener('submit', e => {
-        e.preventDefault();
-        const email = e.target.querySelector('input').value;
-        const payload = {interaction:{name:'Campaigns Events',eventType:'campaignsEvents',campaignName:'Default',campaignSource:'Default',campaignContent:'Default',custom1:'Newsletter Signup',custom2:email,custom3:new Date().toISOString()}};
-        log('Sending Newsletter event:', payload);
-        window.SalesforceInteractions.sendEvent(payload)
-          .then(res => log('Newsletter success', res))
-          .catch(err => log('Newsletter error', err));
-      });
-    });
-  </script>
-</body>
-</html>
+  <div class="modal" id="signup-modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2>Create Account</h2>
+      <form id="signup-form">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+          <label for="signup-email">Email</label>
+          <input type="email" id="signup-email" name="email" required>
+        
