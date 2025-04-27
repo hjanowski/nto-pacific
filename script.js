@@ -1,4 +1,4 @@
-// script.js — Fixed: Added all missing event listeners and comprehensive console logging
+// script.js — Fixed: Added all missing event listeners, comprehensive console logging, and proper Salesforce sequencing
 
 // -- Global state
 const state = {
@@ -6,7 +6,9 @@ const state = {
   cartCount: 0,
   cartTotal: 0,
   currentUser: null,
-  currentProductNotify: null
+  currentProductNotify: null,
+  salesforceInitialized: false,  // Track if Salesforce is initialized
+  identitySent: false           // Track if identity has been sent
 };
 
 // -- Logging function
@@ -142,6 +144,13 @@ function onAddToCart(e) {
   updateCartCount();
   updateCartDisplay();
   showConfirmation(`${name} has been added to your cart!`);
+  
+  // Send Salesforce event for add to cart (with proper sequencing)
+  if (canSendSalesforceEvent()) {
+    sendSalesforceEvent('product_add_to_cart', { product: name });
+  } else {
+    log('Deferring Salesforce event - not initialized or identity not sent', 'info');
+  }
 }
 
 // -- Notify Me
@@ -191,6 +200,10 @@ function handleLoginSubmit(e) {
   
   if (loginUser(email, pwd)) {
     log('Login successful', 'success');
+    
+    // Send identity after successful login
+    sendIdentity();
+    
     closeModal('login-modal');
     updateLoginButton();
     showConfirmation('Logged in successfully');
@@ -225,6 +238,10 @@ function handleSignupSubmit(e) {
   }
   
   log('Signup successful', 'success');
+  
+  // Send identity after successful signup
+  sendIdentity();
+  
   closeModal('signup-modal');
   updateLoginButton();
   showConfirmation('Account created and logged in');
@@ -237,6 +254,13 @@ function handleNewsletterSubmit(e) {
   
   const email = e.target.querySelector('input').value;
   log(`Newsletter signup: ${email}`, 'info');
+  
+  // Send Salesforce event for newsletter signup (with proper sequencing)
+  if (canSendSalesforceEvent()) {
+    sendSalesforceEvent('Newsletter Signup', { email: email });
+  } else {
+    log('Deferring Salesforce event - not initialized or identity not sent', 'info');
+  }
   
   showConfirmation('Thanks for subscribing!');
   e.target.reset();
@@ -257,6 +281,17 @@ function handleNotifySubmit(e) {
 function handleCheckoutSubmit(e) {
   e.preventDefault();
   log('Checkout form submitted', 'event');
+  
+  // Calculate total order value
+  const total = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  log(`Order total: $${total.toFixed(2)}`, 'info');
+  
+  // Send Salesforce event for purchase (with proper sequencing)
+  if (canSendSalesforceEvent()) {
+    sendSalesforceEvent('purchase_complete', { product: `Order Total: $${total.toFixed(2)}` });
+  } else {
+    log('Deferring Salesforce event - not initialized or identity not sent', 'info');
+  }
   
   closeModal('checkout-modal');
   showConfirmation('Order placed!');
@@ -419,6 +454,7 @@ function initConsent() {
     consents: [{ provider: 'CampaignAttribution', purpose: 'Tracking', status: 'Opt In' }]
   }).then(res => {
     log('Salesforce consent initialized', 'success');
+    state.salesforceInitialized = true;
     sendIdentity();
   }).catch(err => {
     log(`Salesforce consent error: ${err}`, 'error');
@@ -427,6 +463,17 @@ function initConsent() {
 
 function sendIdentity() {
   log('Sending identity to Salesforce', 'info');
+  
+  if (!state.salesforceInitialized) {
+    log('Cannot send identity - Salesforce not initialized', 'error');
+    return;
+  }
+  
+  if (state.identitySent) {
+    log('Identity already sent, skipping', 'info');
+    return;
+  }
+  
   window.SalesforceInteractions.sendEvent({ 
     user: { 
       attributes: { 
@@ -437,9 +484,14 @@ function sendIdentity() {
     } 
   }).then(() => {
     log('Identity sent to Salesforce', 'success');
+    state.identitySent = true;
   }).catch(err => {
     log(`Salesforce identity error: ${err}`, 'error');
   });
+}
+
+function canSendSalesforceEvent() {
+  return state.salesforceInitialized && state.identitySent;
 }
 
 function sendSalesforceEvent(type, data) {
@@ -448,24 +500,40 @@ function sendSalesforceEvent(type, data) {
     return;
   }
   
+  if (!canSendSalesforceEvent()) {
+    log(`Cannot send Salesforce event: ${!state.salesforceInitialized ? 'Not initialized' : 'Identity not sent'}`, 'error');
+    return;
+  }
+  
   log(`Sending Salesforce event: ${type}`, 'info');
+  
+  // Get UTM parameters from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const utmSource = urlParams.get('utm_source') || 'Default';
+  const utmCampaign = urlParams.get('utm_campaign') || 'Default';
+  const utmContent = urlParams.get('utm_content') || 'Default';
+  
+  log(`UTM Parameters - Source: ${utmSource}, Campaign: ${utmCampaign}, Content: ${utmContent}`, 'info');
   
   const payload = { 
     interaction: { 
       name: 'Campaigns Events', 
       eventType: 'campaignsEvents', 
-      campaignName: 'Default', 
-      campaignSource: 'Default', 
-      campaignContent: 'Default', 
+      campaignName: utmCampaign, 
+      campaignSource: utmSource, 
+      campaignContent: utmContent, 
       custom1: type, 
       custom2: data.product || data.email, 
       custom3: new Date().toISOString() 
     } 
   };
   
+  log(`Salesforce payload: ${JSON.stringify(payload, null, 2)}`, 'info');
+  
   window.SalesforceInteractions.sendEvent(payload)
-    .then(() => {
-      log(`Salesforce event sent: ${type}`, 'success');
+    .then((res) => {
+      log(`Salesforce event sent successfully: ${type}`, 'success');
+      log(`Salesforce response: ${JSON.stringify(res)}`, 'info');
     })
     .catch(err => {
       log(`Salesforce event error: ${err}`, 'error');
@@ -493,8 +561,13 @@ function showLogoutConfirmation() {
   if (confirm('Are you sure you want to logout?')) {
     log('User confirmed logout', 'info');
     state.currentUser = null;
+    state.identitySent = false;  // Reset identity tracking on logout
     localStorage.removeItem('ntoCurrentUser');
     updateLoginButton();
+    
+    // Send anonymous identity after logout
+    sendIdentity();
+    
     showConfirmation('Logged out successfully');
     log('User logged out successfully', 'success');
   } else {
