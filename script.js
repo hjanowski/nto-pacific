@@ -1,4 +1,4 @@
-// script.js — Complete site logic: auth, cart, modals, Salesforce events
+// script.js — Complete site logic with switchToSignup/Login added
 
 // Global state
 const state = {
@@ -13,7 +13,7 @@ const state = {
 const $ = selector => document.querySelector(selector);
 const $$ = selector => Array.from(document.querySelectorAll(selector));
 
-// DOM Ready
+// ========== DOM READY ===========
 document.addEventListener('DOMContentLoaded', () => {
   // Element references
   const loginBtn = $('#login-btn');
@@ -38,13 +38,12 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeAuthState();
   updateLoginButton();
   updateCartCount();
-  prepareEventBindings();
   startSalesforce();
 
   // Bind modal close icons
   closeModalButtons.forEach(btn => btn.addEventListener('click', () => closeModal(btn.closest('.modal').id)));
 
-  // Bind Continue Shopping on confirmation
+  // Continue Shopping
   $$('.close-confirmation').forEach(btn => btn.addEventListener('click', closeConfirmationModal));
 
   // Add to Cart
@@ -74,9 +73,17 @@ document.addEventListener('DOMContentLoaded', () => {
   if (checkoutForm) checkoutForm.addEventListener('submit', handleCheckoutSubmit);
 });
 
-// Setup event bindings separately
-function prepareEventBindings() {
-  // nothing extra now
+// ========== Toggle between Login and Signup ===========
+function switchToSignup(event) {
+  event.preventDefault();
+  closeModal('login-modal');
+  openModal('signup-modal');
+}
+
+function switchToLogin(event) {
+  event.preventDefault();
+  closeModal('signup-modal');
+  openModal('login-modal');
 }
 
 // ========== Interaction Handlers ===========
@@ -84,10 +91,12 @@ function onLoginButton() {
   if (state.currentUser) showLogoutConfirmation();
   else openModal('login-modal');
 }
+
 function onCartButton() {
   openModal('cart-modal');
   updateCartDisplay();
 }
+
 function onAddToCart(e) {
   const card = e.target.closest('.product-card');
   if (!card) return;
@@ -97,19 +106,21 @@ function onAddToCart(e) {
   const existing = state.cart.find(i => i.id === id);
   if (existing) existing.quantity++;
   else state.cart.push({ id, name, price, quantity: 1 });
-  state.cartCount = state.cart.reduce((s,i)=>s+i.quantity,0);
-  state.cartTotal = state.cart.reduce((s,i)=>s+i.price*i.quantity,0);
+  state.cartCount = state.cart.reduce((s, i) => s + i.quantity, 0);
+  state.cartTotal = state.cart.reduce((s, i) => s + i.price * i.quantity, 0);
   updateCartCount();
   updateCartDisplay();
   showConfirmation(`${name} has been added to your cart!`);
   sendSalesforceEvent('AddToCart', { product: name });
 }
+
 function onNotifyMe(e) {
   const card = e.target.closest('.product-card'); if (!card) return;
   state.currentProductNotify = { id: card.dataset.productId, name: card.dataset.productName };
   const nameEl = $('#notify-product-name'); if (nameEl) nameEl.textContent = state.currentProductNotify.name;
   openModal('notify-modal');
 }
+
 function onCheckoutClick() {
   if (state.currentUser) {
     closeModal('cart-modal');
@@ -136,6 +147,7 @@ function handleLoginSubmit(e) {
     showFormError(e.target, 'Invalid email or password');
   }
 }
+
 function handleSignupSubmit(e) {
   e.preventDefault(); clearFormError(e.target);
   const name = $('#name').value;
@@ -149,16 +161,41 @@ function handleSignupSubmit(e) {
   showConfirmation('Account created and logged in');
   e.target.reset();
 }
-function handleNotifySubmit(e) { e.preventDefault(); closeModal('notify-modal'); showConfirmation(`We'll notify you when ${state.currentProductNotify.name} is back in stock!`); e.target.reset(); }
-function handleNewsletterSubmit(e) { e.preventDefault(); const email = e.target.querySelector('input').value; showConfirmation('Thanks for subscribing!'); sendSalesforceEvent('NewsletterSignup', { email }); e.target.reset(); }
-function handleCheckoutSubmit(e) { e.preventDefault(); closeModal('checkout-modal'); showConfirmation('Order placed!'); state.cart=[]; state.cartCount=0; state.cartTotal=0; updateCartCount(); updateCartDisplay(); e.target.reset(); }
 
-// ========== Confirmation Modal ===========
+function handleNotifySubmit(e) {
+  e.preventDefault();
+  closeModal('notify-modal');
+  showConfirmation(`We'll notify when ${state.currentProductNotify.name} is back in stock!`);
+  e.target.reset();
+}
+
+function handleNewsletterSubmit(e) {
+  e.preventDefault();
+  const email = e.target.querySelector('input').value;
+  showConfirmation('Thanks for subscribing!');
+  sendSalesforceEvent('NewsletterSignup', { email });
+  e.target.reset();
+}
+
+function handleCheckoutSubmit(e) {
+  e.preventDefault();
+  closeModal('checkout-modal');
+  showConfirmation('Order placed!');
+  state.cart = [];
+  state.cartCount = 0;
+  state.cartTotal = 0;
+  updateCartCount();
+  updateCartDisplay();
+  e.target.reset();
+}
+
+// ===== Confirmation Modal =====
 function showConfirmation(message) {
   const textEl = $('#confirmation-text'); if (textEl) textEl.textContent = message;
   const modal = $('#confirmation-modal'); const overlay = $('.overlay');
   if (modal) modal.style.display = 'block'; if (overlay) overlay.style.display = 'block';
 }
+
 function closeConfirmationModal() {
   const modal = $('#confirmation-modal'); const overlay = $('.overlay');
   if (modal) modal.style.display = 'none';
@@ -166,26 +203,20 @@ function closeConfirmationModal() {
   if (!anyOpen && overlay) overlay.style.display = 'none';
 }
 
-// ========== Salesforce Integration ===========
+// ===== Salesforce Integration =====
 function sendSalesforceEvent(type, data) {
   if (!window.SalesforceInteractions) return;
-  const payload = {
-    interaction: {
-      name: 'Campaigns Events',
-      eventType: 'campaignsEvents',
-      campaignName: 'Default',
-      campaignSource: 'Default',
-      campaignContent: 'Default',
-      custom1: type,
-      custom2: data.product || data.email,
-      custom3: new Date().toISOString()
-    }
-  };
+  const payload = { interaction: {
+      name: 'Campaigns Events', eventType: 'campaignsEvents',
+      campaignName: 'Default', campaignSource: 'Default', campaignContent: 'Default',
+      custom1: type, custom2: data.product || data.email, custom3: new Date().toISOString()
+  }};
   console.log('[SF]', type, 'payload', payload);
   window.SalesforceInteractions.sendEvent(payload)
     .then(r => console.log('[SF]', type, 'success', r))
     .catch(e => console.error('[SF]', type, 'error', e));
 }
+
 function startSalesforce() {
   let tries = 0, max = 20;
   const check = () => {
@@ -195,6 +226,7 @@ function startSalesforce() {
   };
   check();
 }
+
 function initConsent() {
   console.log('[SF] initConsent');
   window.SalesforceInteractions.init({
@@ -202,6 +234,7 @@ function initConsent() {
   }).then(r => { console.log('[SF] consent ok', r); sendIdentity(); })
     .catch(e => console.error('[SF] consent err', e));
 }
+
 function sendIdentity() {
   console.log('[SF] sendIdentity');
   window.SalesforceInteractions.sendEvent({
@@ -210,11 +243,12 @@ function sendIdentity() {
     .catch(e => console.error('[SF] identity err', e));
 }
 
-// ========== Auth & UI Helpers ===========
+// ===== Auth & UI Helpers =====
 function initializeAuthState() {
   const u = localStorage.getItem('ntoCurrentUser');
   if (u) state.currentUser = JSON.parse(u);
 }
+
 function loginUser(email, pwd) {
   const users = JSON.parse(localStorage.getItem('ntoUsers') || '[]');
   const u = users.find(x => x.email === email && x.password === pwd);
@@ -225,6 +259,7 @@ function loginUser(email, pwd) {
   }
   return false;
 }
+
 function registerUser(name, email, pw) {
   const arr = JSON.parse(localStorage.getItem('ntoUsers') || '[]');
   if (arr.some(x => x.email === email)) return false;
@@ -235,6 +270,7 @@ function registerUser(name, email, pw) {
   localStorage.setItem('ntoCurrentUser', JSON.stringify(state.currentUser));
   return true;
 }
+
 function updateLoginButton() {
   const b = $('#login-btn');
   if (!b) return;
@@ -246,9 +282,11 @@ function updateLoginButton() {
     b.classList.remove('logged-in');
   }
 }
+
 function updateCartCount() {
   const el = $('.cart-count'); if (el) el.textContent = state.cartCount;
 }
+
 function updateCartDisplay() {
   const itemsEl = $('#cart-items'); const subEl = $('#cart-subtotal'); const shipEl = $('#cart-shipping'); const totEl = $('#cart-total');
   if (!itemsEl || !subEl || !shipEl || !totEl) return;
@@ -260,19 +298,13 @@ function updateCartDisplay() {
     return;
   }
   state.cart.forEach(it => { const row = document.createElement('div'); row.className='cart-item'; row.innerHTML=`<span>${it.name} x${it.quantity}</span><span>$${(it.price*it.quantity).toFixed(2)}</span>`; itemsEl.append(row); });
-  subEl.textContent = `$${state.cartTotal.toFixed(2)}`;
+  subEl.textContent = `$${state.cart.reduce((sum,i)=>sum+i.price*i.quantity,0).toFixed(2)}`;
   const shipping = state.cartTotal>0?10:0;
   shipEl.textContent = `$${shipping.toFixed(2)}`;
   totEl.textContent = `$${(state.cartTotal+shipping).toFixed(2)}`;
 }
+
 function prepareCheckoutModal() { /* populate checkout fields if needed */ }
 function promptLoginMessage() { /* show login required message inside login-form */ }
 function showLogoutConfirmation() { /* implement logout UI flow */ }
-function openModal(id) { const m = $('#'+id), o = $('.overlay'); if (m) m.style.display='block'; if (o) o.style.display='block'; }
-function closeModal(id) { const m = $('#'+id), o = $('.overlay'); if (m) m.style.display='none'; const any = $$('.modal').some(x=>x.style.display==='block'); if (!any && o) o.style.display='none'; }
-function closeAllModals() { $$('.modal').forEach(m=>m.style.display='none'); const o = $('.overlay'); if (o) o.style.display='none'; }
-function showFormError(form, msg) { const p = document.createElement('p'); p.className='form-error'; p.textContent=msg; form.prepend(p); }
-function clearFormError(form) { $$('.form-error').forEach(e=>e.remove()); }
-function fixContinueShoppingButtons() { /* no-op, handled already */ }
-
-// End of script.js
+function fixContinueShoppingButtons() { /* no-op */ }
