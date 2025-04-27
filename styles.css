@@ -265,7 +265,7 @@ nav a:hover, nav a.active {
 
 /* Collection Banner */
 .collection-banner {
-    background: linear-gradient(90deg, rgba(28, 79, 107, 0.9), rgba(10, 44, 60, 0.7)), url('https://via.placeholder.com/1920x400');
+    background: linear-gradient(90deg, rgba(28, 79, 107, 0.9), rgba(10, 44, 60, 0.7)), url('images/pexels-stuart-pritchards-413737-1274009.jpg');
     background-size: cover;
     background-position: center;
     color: var(--white);
