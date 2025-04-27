@@ -48,26 +48,34 @@
             <h2 class="section-title">Featured Equipment</h2>
             <div class="products-grid">
                 <div class="product-card" data-product-id="1" data-product-name="Elite Pro Diving Mask" data-product-price="129.99" data-in-stock="true">
-                    <div class="product-image"></div>
+                    <div class="product-image">
+                        <img src="images/mask.jpg" alt="Elite Pro Diving Mask">
+                    </div>
                     <h3>Elite Pro Diving Mask</h3>
                     <p class="product-price">$129.99</p>
                     <button class="btn-secondary add-to-cart">Add to Cart</button>
                 </div>
                 <div class="product-card" data-product-id="2" data-product-name="Aqua Lung Regulator" data-product-price="349.99" data-in-stock="true">
-                    <div class="product-image"></div>
+                    <div class="product-image">
+                        <img src="images/regulator.jpg" alt="Aqua Lung Regulator">
+                    </div>
                     <h3>Aqua Lung Regulator</h3>
                     <p class="product-price">$349.99</p>
                     <button class="btn-secondary add-to-cart">Add to Cart</button>
                 </div>
                 <div class="product-card" data-product-id="3" data-product-name="Pacific Fins - Limited Edition" data-product-price="189.99" data-in-stock="false">
-                    <div class="product-image"></div>
+                    <div class="product-image">
+                        <img src="images/fins.jpg" alt="Pacific Fins - Limited Edition">
+                    </div>
                     <h3>Pacific Fins - Limited Edition</h3>
                     <p class="product-price">$189.99</p>
                     <p class="out-of-stock">Out of Stock</p>
                     <button class="btn-secondary notify-me">Notify Me</button>
                 </div>
                 <div class="product-card" data-product-id="4" data-product-name="Dive Computer Pro X" data-product-price="599.99" data-in-stock="true">
-                    <div class="product-image"></div>
+                    <div class="product-image">
+                        <img src="images/computer.jpg" alt="Dive Computer Pro X">
+                    </div>
                     <h3>Dive Computer Pro X</h3>
                     <p class="product-price">$599.99</p>
                     <button class="btn-secondary add-to-cart">Add to Cart</button>
@@ -134,59 +142,12 @@
         </div>
     </footer>
 
-    <!-- Modal Components -->
-    <div class="modal" id="login-modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>Login to NTO Pacific</h2>
-            <form id="login-form">
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-                <button type="submit" class="btn-primary btn-full">Login</button>
-            </form>
-            <p class="form-footer">Don't have an account? <a href="#" id="show-signup">Sign up</a></p>
-        </div>
-    </div>
-    <div class="modal" id="signup-modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>Create Account</h2>
-            <form id="signup-form">
-                <div class="form-group">
-                    <label for="name">Full Name</label>
-                    <input type="text" id="name" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label for="signup-email">Email</label>
-                    <input type="email" id="signup-email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="signup-password">Password</label>
-                    <input type="password" id="signup-password" name="password" required>
-                </div>
-                <div class="form-group">
-                    <label for="confirm-password">Confirm Password</label>
-                    <input type="password" id="confirm-password" name="confirm-password" required>
-                </div>
-                <button type="submit" class="btn-primary btn-full">Create Account</button>
-            </form>
-            <p class="form-footer">Already have an account? <a href="#" id="show-login">Login</a></p>
-        </div>
-    </div>
-    <div class="modal" id="cart-modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>Your Cart</h2>
-            <div id="cart-items"></div>
-            <div class="cart-summary">
-                <p>Subtotal: <span id="cart-subtotal">$0.00</span></p>
-                <p>Shipping: <span id="cart-shipping">$0.00</span></p>
-                <p>Total: <span id="cart-total">$0.00</span></p>
-            </div>
-            <button id="checkout-btn" class="btn
+    <!-- Modal Components (login, signup, cart, checkout, notify, confirmation) -->
+    <!-- Overlay -->
+    <div class="overlay"></div>
+
+    <script>
+    // Inline Salesforce init & event scripts
+    </script>
+</body>
+</html>
