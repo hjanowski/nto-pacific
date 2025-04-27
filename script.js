@@ -1,4 +1,4 @@
-// script.js — Fixed: closeAllModals is defined, and login toggles now work
+// script.js — Fixed: Added all missing event listeners
 
 // -- Global state
 const state = {
@@ -282,3 +282,116 @@ function showFormError(form, msg) {
 function clearFormError(form) {
   form.querySelectorAll('.form-error').forEach(e => e.remove());
 }
+
+// -- Logout functionality (was missing)
+function showLogoutConfirmation() {
+  if (confirm('Are you sure you want to logout?')) {
+    state.currentUser = null;
+    localStorage.removeItem('ntoCurrentUser');
+    updateLoginButton();
+    showConfirmation('Logged out successfully');
+  }
+}
+
+// -- Event Listeners (THIS WAS MISSING!)
+document.addEventListener('DOMContentLoaded', () => {
+  // Initialize auth state
+  initializeAuthState();
+  updateLoginButton();
+  updateCartCount();
+  
+  // Login button event
+  const loginBtn = $('#login-btn');
+  if (loginBtn) {
+    loginBtn.addEventListener('click', onLoginButton);
+  }
+  
+  // Cart button event
+  const cartBtn = $('#cart-btn');
+  if (cartBtn) {
+    cartBtn.addEventListener('click', onCartButton);
+  }
+  
+  // Add to cart buttons
+  const addToCartButtons = $$('.add-to-cart');
+  addToCartButtons.forEach(btn => {
+    btn.addEventListener('click', onAddToCart);
+  });
+  
+  // Notify me buttons
+  const notifyButtons = $$('.notify-me');
+  notifyButtons.forEach(btn => {
+    btn.addEventListener('click', onNotifyMe);
+  });
+  
+  // Form submissions
+  const loginForm = $('#login-form');
+  if (loginForm) {
+    loginForm.addEventListener('submit', handleLoginSubmit);
+  }
+  
+  const signupForm = $('#signup-form');
+  if (signupForm) {
+    signupForm.addEventListener('submit', handleSignupSubmit);
+  }
+  
+  const newsletterForm = $('#newsletter-form-footer');
+  if (newsletterForm) {
+    newsletterForm.addEventListener('submit', handleNewsletterSubmit);
+  }
+  
+  const notifyForm = $('#notify-form');
+  if (notifyForm) {
+    notifyForm.addEventListener('submit', handleNotifySubmit);
+  }
+  
+  const checkoutForm = $('#checkout-form');
+  if (checkoutForm) {
+    checkoutForm.addEventListener('submit', handleCheckoutSubmit);
+  }
+  
+  // Auth toggle links
+  const showSignupLink = $('#show-signup');
+  if (showSignupLink) {
+    showSignupLink.addEventListener('click', switchToSignup);
+  }
+  
+  const showLoginLink = $('#show-login');
+  if (showLoginLink) {
+    showLoginLink.addEventListener('click', switchToLogin);
+  }
+  
+  // Checkout button in cart
+  const checkoutBtn = $('#checkout-btn');
+  if (checkoutBtn) {
+    checkoutBtn.addEventListener('click', onCheckoutClick);
+  }
+  
+  // Close modal buttons
+  const closeModalButtons = $$('.close-modal');
+  closeModalButtons.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const modal = e.target.closest('.modal');
+      if (modal) {
+        closeModal(modal.id);
+      }
+    });
+  });
+  
+  // Close confirmation modal button
+  const closeConfirmationBtn = $('.close-confirmation');
+  if (closeConfirmationBtn) {
+    closeConfirmationBtn.addEventListener('click', closeConfirmationModal);
+  }
+  
+  // Shop now button
+  const shopNowBtn = $('#shop-now-btn');
+  if (shopNowBtn) {
+    shopNowBtn.addEventListener('click', () => {
+      window.location.href = 'catalog.html';
+    });
+  }
+  
+  // Start Salesforce integration
+  startSalesforce();
+});
