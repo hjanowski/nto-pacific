@@ -1,49 +1,65 @@
-// script-updated.js — Adds explicit 'Continue Shopping' handler for confirmation modal
+// script-updated.js — Full Add-to-Cart with working confirmation modal
 
-// Global state
-const state = { cart: [], cartCount: 0, cartTotal: 0, currentUser: null, currentProductNotify: null };
+// Global cart state
+const state = {
+  cart: [],
+  cartCount: 0,
+  cartTotal: 0
+};
 
-// Utility for query
-const $ = sel => document.querySelector(sel);
-const $$ = sel => Array.from(document.querySelectorAll(sel));
+// Utility selectors
+const $ = selector => document.querySelector(selector);
+const $$ = selector => Array.from(document.querySelectorAll(selector));
 
-// DOM Ready
+// Close the confirmation modal
+function closeConfirmationModal() {
+  const modal = $('#confirmation-modal');
+  const overlay = $('.overlay');
+  if (modal) modal.style.display = 'none';
+  // Hide overlay only if no other modal open
+  const anyOpen = $$('.modal').some(m => m.style.display === 'block');
+  if (!anyOpen && overlay) overlay.style.display = 'none';
+}
+
+// Initialize on DOM ready
 document.addEventListener('DOMContentLoaded', () => {
-  // Elements
-  const addToCartButtons = $$('.add-to-cart');
-
-  // Show confirmation modal when needed
-  function showConfirmation(msg) {
-    const textEl = $('#confirmation-text');
-    if (textEl) textEl.textContent = msg;
-    const modal = $('#confirmation-modal');
-    const overlay = $('.overlay');
-    if (modal) modal.style.display = 'block';
-    if (overlay) overlay.style.display = 'block';
-  }
-
-  // Close confirmation
-  const closeConfButtons = $$('.close-confirmation');
-  closeConfButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const modal = $('#confirmation-modal');
-      const overlay = $('.overlay');
-      if (modal) modal.style.display = 'none';
-      // hide overlay only if no other modals open
-      const anyOpen = $$('.modal').some(m => m.style.display === 'block');
-      if (!anyOpen && overlay) overlay.style.display = 'none';
-    });
+  // Bind Continue Shopping button(s)
+  $$('.close-confirmation').forEach(btn => {
+    btn.addEventListener('click', closeConfirmationModal);
   });
 
-  // Add to cart
-  addToCartButtons.forEach(btn => {
-    btn.addEventListener('click', e => {
-      const card = e.target.closest('.product-card');
+  // Bind Add to Cart buttons
+  $$('.add-to-cart').forEach(btn => {
+    btn.addEventListener('click', event => {
+      const card = event.target.closest('.product-card');
       if (!card) return;
+
+      // Extract product data
+      const id = card.dataset.productId;
       const name = card.dataset.productName;
-      // Update cart state (omitted here)
-      // ...
-      showConfirmation(`${name} has been added to your cart!`);
+      const price = parseFloat(card.dataset.productPrice);
+
+      // Update cart state
+      const existing = state.cart.find(item => item.id === id);
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        state.cart.push({ id, name, price, quantity: 1 });
+      }
+      state.cartCount = state.cart.reduce((sum, i) => sum + i.quantity, 0);
+      state.cartTotal = state.cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
+
+      // Update cart count UI
+      const cartCountEl = $('.cart-count');
+      if (cartCountEl) cartCountEl.textContent = state.cartCount;
+
+      // Show confirmation modal
+      const textEl = $('#confirmation-text');
+      if (textEl) textEl.textContent = `${name} has been added to your cart!`;
+      const modal = $('#confirmation-modal');
+      const overlay = $('.overlay');
+      if (modal) modal.style.display = 'block';
+      if (overlay) overlay.style.display = 'block';
     });
   });
 });
