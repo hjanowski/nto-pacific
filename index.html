@@ -1,164 +1,199 @@
-// script-updated.js — Null checks + auto-close for confirmation modal
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NTO Pacific | Premium Diving Equipment</title>
+  <!-- Suppress favicon 404 -->
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+  <!-- Salesforce Interactions SDK -->
+  <script src="https://cdn.c360a.salesforce.com/beacon/c360a/233a8f36-3f93-4e01-84e5-c210837a6c97/scripts/c360a.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="logo">
+        <h1>NTO Pacific</h1>
+        <p>Premium Diving Equipment</p>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="#" class="active">Home</a></li>
+          <li><a href="catalog.html">Shop</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="user-actions">
+        <button id="cart-btn" class="btn-icon"><span class="cart-count">0</span>🛒</button>
+        <button id="login-btn" class="btn-primary">Login</button>
+      </div>
+    </div>
+  </header>
 
-// Global state
-const state = {
-  cart: [],
-  cartCount: 0,
-  cartTotal: 0,
-  currentUser: null,
-  currentProductNotify: null
-};
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <h2>Explore the Depths</h2>
+        <p>Professional diving equipment for every adventure</p>
+        <button class="btn-primary btn-large" id="shop-now-btn">Shop Now</button>
+      </div>
+    </div>
+  </section>
 
-// Utility: shorthand query
-const $ = selector => document.querySelector(selector);
+  <section class="featured-products">
+    <div class="container">
+      <h2 class="section-title">Featured Equipment</h2>
+      <div class="products-grid">
+        <div class="product-card" data-product-id="1" data-product-name="Elite Pro Diving Mask" data-product-price="129.99" data-in-stock="true">
+          <div class="product-image"></div>
+          <h3>Elite Pro Diving Mask</h3>
+          <p class="product-price">$129.99</p>
+          <button class="btn-secondary add-to-cart">Add to Cart</button>
+        </div>
+        <div class="product-card" data-product-id="2" data-product-name="Aqua Lung Regulator" data-product-price="349.99" data-in-stock="true">
+          <div class="product-image"></div>
+          <h3>Aqua Lung Regulator</h3>
+          <p class="product-price">$349.99</p>
+          <button class="btn-secondary add-to-cart">Add to Cart</button>
+        </div>
+        <div class="product-card" data-product-id="3" data-product-name="Pacific Fins - Limited Edition" data-product-price="189.99" data-in-stock="false">
+          <div class="product-image"></div>
+          <h3>Pacific Fins - Limited Edition</h3>
+          <p class="product-price">$189.99</p>
+          <p class="out-of-stock">Out of Stock</p>
+          <button class="btn-secondary notify-me">Notify Me</button>
+        </div>
+        <div class="product-card" data-product-id="4" data-product-name="Dive Computer Pro X" data-product-price="599.99" data-in-stock="true">
+          <div class="product-image"></div>
+          <h3>Dive Computer Pro X</h3>
+          <p class="product-price">$599.99</p>
+          <button class="btn-secondary add-to-cart">Add to Cart</button>
+        </div>
+      </div>
+    </div>
+  </section>
 
-// ========== DOM READY ===========
-document.addEventListener('DOMContentLoaded', () => {
-  // Elements
-  const loginBtn = $('#login-btn');
-  const cartBtn = $('#cart-btn');
-  const overlay = $('.overlay');
-  const showSignupLink = $('#show-signup');
-  const showLoginLink = $('#show-login');
-  const addToCartButtons = document.querySelectorAll('.add-to-cart');
-  const notifyButtons = document.querySelectorAll('.notify-me');
-  const checkoutBtn = $('#checkout-btn');
-  const closeModalButtons = document.querySelectorAll('.close-modal');
+  <section class="collection-banner">
+    <div class="container">
+      <div class="banner-content">
+        <h2>New 2025 Collection</h2>
+        <p>Engineered for the deepest dives</p>
+        <button class="btn-primary">Explore Collection</button>
+      </div>
+    </div>
+  </section>
 
-  // Forms
-  const loginForm = $('#login-form');
-  const signupForm = $('#signup-form');
-  const checkoutForm = $('#checkout-form');
-  const notifyForm = $('#notify-form');
-  const newsletterForm = $('#newsletter-form');
-  const newsletterFooterForm = $('#newsletter-form-footer');
+  <!-- Full Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-columns">
+        <div class="footer-column">
+          <h3>NTO Pacific</h3>
+          <p>Premium diving equipment for professional and recreational divers since 2010.</p>
+        </div>
+        <div class="footer-column">
+          <h3>Quick Links</h3>
+          <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Shop</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h3>Customer Service</h3>
+          <ul>
+            <li><a href="#">Shipping</a></li>
+            <li><a href="#">Returns</a></li>
+            <li><a href="#">FAQ</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h3>Newsletter</h3>
+          <p>Subscribe for updates on new products and promotions</p>
+          <form id="newsletter-form-footer">
+            <input type="email" placeholder="Your email">
+            <button type="submit" class="btn-primary">Subscribe</button>
+          </form>
+        </div>
+      </div>
+      <div class="copyright">
+        <p>© 2025 NTO Pacific. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
 
-  // Init state
-  initializeAuthState();
-  updateCartCount();
+  <!-- Modal Components -->
+  <div class="modal" id="login-modal"> ... </div>
+  <div class="modal" id="signup-modal"> ... </div>
+  <div class="modal" id="cart-modal"> ... </div>
+  <div class="modal" id="checkout-modal"> ... </div>
+  <div class="modal" id="notify-modal"> ... </div>
+  <div class="modal" id="confirmation-modal"> ... </div>
 
-  // Modal event bindings
-  if (loginBtn) loginBtn.addEventListener('click', onLoginButton);
-  if (cartBtn) cartBtn.addEventListener('click', onCartButton);
-  if (overlay) overlay.addEventListener('click', closeAllModals);
-  if (showSignupLink) showSignupLink.addEventListener('click', switchToSignup);
-  if (showLoginLink) showLoginLink.addEventListener('click', switchToLogin);
-  closeModalButtons.forEach(btn => btn.addEventListener('click', () => closeModal(btn.closest('.modal').id)));
+  <div class="overlay"></div>
 
-  // Product event bindings
-  addToCartButtons.forEach(btn => btn.addEventListener('click', onAddToCart));
-  notifyButtons.forEach(btn => btn.addEventListener('click', onNotifyMe));
+  <!-- Inline Salesforce init & event scripts -->
+  <script>
+    const log = (...args) => console.log('[SF]', ...args);
+    document.addEventListener('DOMContentLoaded', () => {
+      log('Checking SDK...');
+      let attempts = 0;
+      const max = 20;
+      const check = () => {
+        if (window.SalesforceInteractions &&
+            typeof window.SalesforceInteractions.sendEvent === 'function') {
+          log('SDK loaded');
+          initConsent();
+        } else if (++attempts < max) {
+          setTimeout(check, 1000);
+        } else {
+          log('SDK failed to load after attempts');
+        }
+      };
+      check();
 
-  if (checkoutBtn) checkoutBtn.addEventListener('click', onCheckoutClick);
+      function initConsent() {
+        log('Initializing consent...');
+        window.SalesforceInteractions.init({
+          consents:[{provider:'CampaignAttribution',purpose:'Tracking',status:'Opt In'}]
+        }).then(res => {
+          log('Consent init success', res);
+          sendIdentity();
+        }).catch(err => log('Consent init error', err));
+      }
+      function sendIdentity() {
+        log('Sending identity...');
+        window.SalesforceInteractions.sendEvent({user:{attributes:{eventType:'identity',email:'',isAnonymous:0}}})
+          .then(res => log('Identity sent', res))
+          .catch(err => log('Identity error', err));
+      }
 
-  // Form submissions
-  if (loginForm) loginForm.addEventListener('submit', handleLoginSubmit);
-  if (signupForm) signupForm.addEventListener('submit', handleSignupSubmit);
-  if (notifyForm) notifyForm.addEventListener('submit', handleNotifySubmit);
-  if (newsletterForm) newsletterForm.addEventListener('submit', handleNewsletterSubmit);
-  if (newsletterFooterForm) newsletterFooterForm.addEventListener('submit', handleNewsletterSubmit);
-  if (checkoutForm) checkoutForm.addEventListener('submit', handleCheckoutSubmit);
+      // Wire add-to-cart
+      document.querySelectorAll('.add-to-cart').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const payload = {interaction:{name:'Campaigns Events',eventType:'campaignsEvents',campaignName:'Default',campaignSource:'Default',campaignContent:'Default',custom1:'product_add_to_cart',custom2:btn.closest('.product-card').dataset.productName,custom3:new Date().toISOString()}};
+          log('Sending Add-to-cart event:', payload);
+          window.SalesforceInteractions.sendEvent(payload)
+            .then(res => log('Add-to-cart success', res))
+            .catch(err => log('Add-to-cart error', err));
+        });
+      });
 
-  // Begin Salesforce SDK flow
-  startSalesforce();
-});
-
-// ========== Event Handlers ===========
-function onLoginButton() {
-  if (state.currentUser) showLogoutConfirmation();
-  else openModal('login-modal');
-}
-function onCartButton() {
-  openModal('cart-modal');
-  updateCartDisplay();
-}
-function switchToSignup(e) {
-  e.preventDefault(); closeModal('login-modal'); openModal('signup-modal');
-}
-function switchToLogin(e) {
-  e.preventDefault(); closeModal('signup-modal'); openModal('login-modal');
-}
-function onAddToCart(e) {
-  const card = e.target.closest('.product-card'); if (!card) return;
-  addToCart(card);
-}
-function onNotifyMe(e) {
-  const card = e.target.closest('.product-card'); if (!card) return;
-  state.currentProductNotify = { id: card.dataset.productId, name: card.dataset.productName };
-  const nameEl = $('#notify-product-name'); if (nameEl) nameEl.textContent = state.currentProductNotify.name;
-  openModal('notify-modal');
-}
-function onCheckoutClick() {
-  if (state.currentUser) { closeModal('cart-modal'); openModal('checkout-modal'); prepareCheckoutModal(); }
-  else { closeModal('cart-modal'); openModal('login-modal'); promptLoginMessage(); }
-}
-
-// ========== Form Handlers ===========
-function handleLoginSubmit(e) { e.preventDefault(); const email=$('#email').value, pwd=$('#password').value;
-  if (loginUser(email,pwd)) { closeModal('login-modal'); updateLoginButton(); showConfirmation('Logged in!'); e.target.reset(); }
-  else showFormError(e.target,'Invalid credentials');
-}
-function handleSignupSubmit(e) {
-  e.preventDefault(); clearFormError(e.target);
-  const name=$('#name').value, email=$('#signup-email').value, pw=$('#signup-password').value, cpw=$('#confirm-password').value;
-  if (pw!==cpw) return showFormError(e.target,'Passwords do not match');
-  if (!registerUser(name,email,pw)) return showFormError(e.target,'Email exists');
-  closeModal('signup-modal'); updateLoginButton(); showConfirmation('Account created!'); e.target.reset();
-}
-function handleNotifySubmit(e) { e.preventDefault(); showConfirmation(`We'll notify when ${state.currentProductNotify.name} is back`); e.target.reset(); }
-function handleNewsletterSubmit(e) { e.preventDefault(); const email=e.target.querySelector('input').value; showConfirmation('Thanks for subscribing!'); e.target.reset(); sendSalesforceEvent('Newsletter Signup',{email}); }
-function handleCheckoutSubmit(e) { e.preventDefault(); closeModal('checkout-modal'); showConfirmation('Order placed!'); state.cart=[]; state.cartCount=0; state.cartTotal=0; updateCartCount(); e.target.reset(); }
-
-// ========= Core Features ==========
-function addToCart(card) {
-  const id=card.dataset.productId, name=card.dataset.productName, price=parseFloat(card.dataset.productPrice);
-  const existing=state.cart.find(i=>i.id===id);
-  if (existing) existing.quantity++; else state.cart.push({id,name,price,quantity:1});
-  state.cartCount=state.cart.reduce((s,i)=>s+i.quantity,0);
-  state.cartTotal=state.cart.reduce((s,i)=>s+(i.price*i.quantity),0);
-  updateCartCount(); showConfirmation(`${name} added to cart!`);
-
-  // Trigger Salesforce event
-  sendSalesforceEvent('AddToCart',{product:name});
-
-  // Auto-close confirmation modal after 2s
-  setTimeout(()=>closeModal('confirmation-modal'),2000);
-}
-
-// ========== Salesforce Integration ==========
-function sendSalesforceEvent(type,data) {
-  if (!window.SalesforceInteractions) return;
-  const payload={interaction:{name:'Campaigns Events',eventType:'campaignsEvents',campaignName:'Default',campaignSource:'Default',campaignContent:'Default',custom1:type,custom2:data.product||data.email,custom3:new Date().toISOString()}};
-  console.log('[SF]',type,'payload',payload);
-  window.SalesforceInteractions.sendEvent(payload)
-    .then(r=>console.log('[SF]',type,'success',r))
-    .catch(e=>console.error('[SF]',type,'error',e));
-}
-function startSalesforce() {
-  let tries=0, max=20;
-  const check=()=>{
-    if (window.SalesforceInteractions && typeof window.SalesforceInteractions.init==='function') return initConsent();
-    if (++tries<max) setTimeout(check,1000);
-    else console.error('[SF] SDK failed to load');
-  }; check();
-}
-function initConsent() { console.log('[SF] initConsent'); window.SalesforceInteractions.init({consents:[{provider:'CampaignAttribution',purpose:'Tracking',status:'Opt In'}]}) .then(r=>{console.log('[SF] consent ok',r); sendIdentity();}) .catch(e=>console.error('[SF] consent err',e)); }
-function sendIdentity() { console.log('[SF] sendIdentity'); window.SalesforceInteractions.sendEvent({user:{attributes:{eventType:'identity',email:state.currentUser?.email||'',isAnonymous:!state.currentUser}}}) .then(r=>console.log('[SF] identity ok',r)) .catch(e=>console.error('[SF] identity err',e)); }
-
-// ========= Auth/Cart/Modal Helpers ==========
-function initializeAuthState(){const u=localStorage.getItem('ntoCurrentUser'); if(u){state.currentUser=JSON.parse(u); updateLoginButton();}}
-function loginUser(email,pwd){const u=JSON.parse(localStorage.getItem('ntoUsers')||'[]').find(x=>x.email===email&&x.password===pwd); if(u){state.currentUser={id:u.id,name:u.name,email:u.email}; localStorage.setItem('ntoCurrentUser',JSON.stringify(state.currentUser));return true;}return false;}
-function registerUser(name,email,pw){const a=JSON.parse(localStorage.getItem('ntoUsers')||'[]'); if(a.some(x=>x.email===email))return false; const u={id:Date.now().toString(),name,email,password:pw,createdAt:new Date().toISOString()}; a.push(u); localStorage.setItem('ntoUsers',JSON.stringify(a)); state.currentUser={id:u.id,name,email}; localStorage.setItem('ntoCurrentUser',JSON.stringify(state.currentUser)); return true;}
-function updateLoginButton(){const b=$('#login-btn'); if(!b)return; if(state.currentUser){b.textContent=state.currentUser.name.split(' ')[0]; b.classList.add('logged-in');} else {b.textContent='Login'; b.classList.remove('logged-in');}}
-function updateCartCount(){const el=$('.cart-count'); if(el)el.textContent=state.cartCount;}
-function prepareCheckoutModal(){/* compute and fill checkout fields */}
-function promptLoginMessage(){/* show login required prompt */}
-function showLogoutConfirmation(){/* existing logout modal logic */}
-function openModal(id){const m=$('#'+id), o=$('.overlay'); if(m) m.style.display='block'; if(o) o.style.display='block';}
-function closeModal(id){const m=$('#'+id); if(m) m.style.display='none'; const any=Array.from(document.querySelectorAll('.modal')).some(x=>x.style.display==='block'); if(!any&&$('.overlay')) $('.overlay').style.display='none';}
-function closeAllModals(){document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); if($('.overlay')) $('.overlay').style.display='none';}
-function showConfirmation(msg){const t=$('#confirmation-text'); if(t) t.textContent=msg; openModal('confirmation-modal');}
-function showFormError(form,txt){clearFormError(form); const p=document.createElement('p'); p.className='form-error'; p.textContent=txt; form.prepend(p);}function clearFormError(form){form.querySelectorAll('.form-error').forEach(e=>e.remove());}
-function fixContinueShoppingButtons(){document.querySelectorAll('.close-confirmation').forEach(btn=>{const nb=btn.cloneNode(true); btn.replaceWith(nb); nb.addEventListener('click',()=>closeModal('confirmation-modal'));});}
-
-// End of script-updated.js
+      // Wire newsletter
+      document.getElementById('newsletter-form-footer').addEventListener('submit', e => {
+        e.preventDefault();
+        const email = e.target.querySelector('input').value;
+        const payload = {interaction:{name:'Campaigns Events',eventType:'campaignsEvents',campaignName:'Default',campaignSource:'Default',campaignContent:'Default',custom1:'Newsletter Signup',custom2:email,custom3:new Date().toISOString()}};
+        log('Sending Newsletter event:', payload);
+        window.SalesforceInteractions.sendEvent(payload)
+          .then(res => log('Newsletter success', res))
+          .catch(err => log('Newsletter error', err));
+      });
+    });
+  </script>
+</body>
+</html>
