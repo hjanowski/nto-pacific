@@ -1,4 +1,4 @@
-// script.js — Fixed: Added all missing event listeners, comprehensive console logging, and proper Salesforce sequencing
+// script.js — Fixed: Added all missing event listeners, comprehensive console logging, proper Salesforce sequencing, and checkout total display
 
 // -- Global state
 const state = {
@@ -181,11 +181,54 @@ function onCheckoutClick() {
     log('User is logged in, proceeding to checkout', 'info');
     closeModal('cart-modal');
     openModal('checkout-modal');
+    updateCheckoutSummary();  // Update the order summary in checkout modal
   } else {
     log('User is not logged in, redirecting to login', 'info');
     closeModal('cart-modal');
     openModal('login-modal');
   }
+}
+
+// -- Update checkout summary
+function updateCheckoutSummary() {
+  log('Updating checkout summary', 'info');
+  
+  const orderSummaryEl = $('.order-summary');
+  if (!orderSummaryEl) {
+    log('Order summary element not found', 'error');
+    return;
+  }
+  
+  // Calculate subtotal and shipping
+  let subtotal = 0;
+  state.cart.forEach(item => {
+    subtotal += item.price * item.quantity;
+  });
+  
+  const shipping = subtotal > 0 ? 10 : 0;
+  const total = subtotal + shipping;
+  
+  // Create a detailed order summary
+  let summaryHTML = '<h3>Order Summary</h3>';
+  
+  // Add each item
+  state.cart.forEach(item => {
+    summaryHTML += `<div class="order-item"><span>${item.name} x${item.quantity}</span><span>$${(item.price * item.quantity).toFixed(2)}</span></div>`;
+  });
+  
+  // Add subtotal
+  summaryHTML += `<div class="order-subtotal"><span>Subtotal:</span><span>$${subtotal.toFixed(2)}</span></div>`;
+  
+  // Add shipping
+  summaryHTML += `<div class="order-shipping"><span>Shipping:</span><span>$${shipping.toFixed(2)}</span></div>`;
+  
+  // Add total
+  summaryHTML += `<div class="order-total-row"><span>Total:</span><span>$${total.toFixed(2)}</span></div>`;
+  
+  // Update the order summary
+  orderSummaryEl.innerHTML = summaryHTML;
+  
+  log(`Checkout summary updated: Subtotal: $${subtotal.toFixed(2)}, Shipping: $${shipping}, Total: $${total.toFixed(2)}`, 'success');
 }
 
 // -- Form handlers
@@ -378,6 +421,12 @@ function updateCartDisplay() {
   $('#checkout-btn').disabled = false;
   
   log(`Cart updated: Subtotal: $${subtotal.toFixed(2)}, Shipping: $${shipping}, Total: $${(subtotal + shipping).toFixed(2)}`, 'success');
+  
+  // Also update checkout summary if checkout modal is visible
+  const checkoutModal = $('#checkout-modal');
+  if (checkoutModal && checkoutModal.style.display === 'block') {
+    updateCheckoutSummary();
+  }
 }
 
 // -- Auth and storage
