@@ -215,7 +215,7 @@ function attachEventHandlers() {
                                 campaignTerm: utmParams.utm_term || "",
                                 custom1: "product_add_to_cart",
                                 custom2: productName,
-                                custom3: parseFloat(productPrice)
+                                custom3: new Date().toISOString()
                             }
                         };
                         
@@ -247,7 +247,7 @@ function attachEventHandlers() {
                                         campaignContent: utmParams.utm_content || "",
                                         custom1: "product_add_to_cart",
                                         custom2: productName,
-                                        custom3: parseFloat(productPrice)
+                                        custom3: new Date().toISOString()
                                     }
                                 };
                                 
@@ -322,7 +322,7 @@ function attachEventHandlers() {
                                 campaignTerm: utmParams.utm_term || "",
                                 custom1: "newsletter_signup",
                                 custom2: "homepage_footer",
-                                custom3: userEmail
+                                custom3: new Date().toISOString()
                             }
                         });
                     })
@@ -430,8 +430,7 @@ function attachEventHandlers() {
                             campaignContent: utmParams.utm_content || "",
                             custom1: "product_notification",
                             custom2: productName,
-                            custom3: notifyEmail
-                        }
+                            custom3: new Date().toISOString()                        }
                     }).then(() => {
                         debugLog('✅ Notify Me event sent successfully');
                         
